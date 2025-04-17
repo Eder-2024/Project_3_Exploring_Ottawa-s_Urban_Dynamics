@@ -2,119 +2,228 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Accident Data Visualization Dashboard</title>
+    <title>Ottawa Accident Data Visualization Dashboard (2020)</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 30px;
-            background-color: #f9f9f9;
+            margin: 0;
+            background-color: #f4f7f9;
+            padding: 40px;
         }
 
-        h1 {
-            color: #333;
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
         }
 
-        select, label {
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        select {
+            padding: 8px 12px;
             font-size: 16px;
-            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
         }
 
-        .nav-links {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .nav-links h2 {
-            margin-bottom: 15px;
-        }
-
-        .nav-links ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .nav-links li {
-            margin-bottom: 10px;
-        }
-
-        .nav-links a {
-            color: #007BFF;
-            text-decoration: none;
+        button {
+            padding: 10px 20px;
             font-size: 16px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .nav-links a:hover {
-            text-decoration: underline;
+        button:hover {
+            background-color: #2980b9;
         }
 
         #line-chart {
+            height: 500px;
             margin-top: 30px;
             background-color: white;
             border-radius: 10px;
             padding: 20px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        form select {
+            margin-bottom: 15px;
+        }
+
+        #visualization {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .note {
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
-    <h1>Accident Data Visualization Dashboard</h1>
 
-    <!-- Dropdown for filtering severity -->
-    <label for="severity">Select Severity:</label>
-    <select id="severity">
-        <option value="all">All</option>
-        <option value="01 - Minimal">Minimal</option>
-        <option value="02 - Minor">Minor</option>
-        <option value="03 - Major">Major</option>
-        <option value="04 - Fatal">Fatal</option>
-        <option value="blank">Unknown / Not Reported</option>
-    </select>
-
-    <!-- Line Chart Container -->
-    <h2>Accident Trend Over Time</h2>
-    <div id="line-chart" style="height: 500px;"></div>
-
-    <!-- Navigation Links -->
-    <div class="nav-links">
-        <h2>Explore More Visualizations</h2>
-        <ul>
-            <li><a href="/histogram">View Histogram of Number of Vehicles Involved in Accidents</a></li>
-            <li><a href="/boxplot">View Boxplot: Accident Severity by Road Surface Condition</a></li>
-            <li><a href="/heatmap">Explore Accident Density with Interactive Heatmap</a></li>
-            <li><a href="/linechart">Detailed Line Chart: Date vs Accident Count</a></li>
-        </ul>
+<div class="container">
+    <h1>🚗 Ottawa Accident Data Visualization Dashboard (2020)</h1>
+    <div class="injury-boxes">
+        <div class="injury-box">🟢 Minimal Injuries: {{ injury_totals['Minimal'] }}</div>
+        <div class="injury-box">🟡 Minor Injuries: {{ injury_totals['Minor'] }}</div>
+        <div class="injury-box">🟠 Major Injuries: {{ injury_totals['Major'] }}</div>
+        <div class="injury-box">🔴 Fatal Injuries: {{ injury_totals['Fatal'] }}</div>
+    
     </div>
 
-    <script>
-        function updateChart(severity) {
-            fetch(`/api/linechart?severity=${severity}`)
-                .then(res => res.json())
-                .then(data => {
-                    const dates = data.map(d => d.date);
-                    const counts = data.map(d => d.accident_count);
-                    Plotly.newPlot('line-chart', [{
-                        x: dates,
-                        y: counts,
-                        type: 'scatter',
-                        mode: 'lines+markers',
-                        marker: { color: '#e74c3c' }
-                    }], {
-                        title: `Accidents Over Time (${severity === 'all' ? 'All Severities' : severity})`,
-                        xaxis: { title: 'Date' },
-                        yaxis: { title: 'Number of Accidents' }
-                    });
+    <!-- Severity filter -->
+    <div class="chart-row">
+        <div class="chart-spacer"></div>
+        <div class="chart-box">
+            <div class="form-group">
+                <label for="severity">Select Severity:</label>
+                <select id="severity">
+                    <option value="all">All</option>
+                    <option value="01 - Minimal">Minimal</option>
+                    <option value="02 - Minor">Minor</option>
+                    <option value="03 - Major">Major</option>
+                    <option value="04 - Fatal">Fatal</option>
+                    <!-- Removed "Unknown" as requested earlier -->
+                </select>
+            </div>
+    
+            <div id="line-chart"></div>
+        </div>
+    </div>
+
+    <!-- Visualization selection form -->
+    <h2>📊 Explore More Visualizations & Statistical Analyses</h2>
+    <form method="POST" id="viz-form">
+        <div class="form-group">
+            <div>
+                <label for="viz">Data Visualizations:</label>
+                <select name="viz" id="viz">
+                    <option value="">-- Select --</option>
+                    <option value="histogram">Histogram</option>
+                    <option value="heatmap">Heatmap 🌍 (opens in new tab)</option>
+                    <option value="top_dates">Top 10 Dates with Most Accidents</option>
+                    <option value="light_conditions">Pie Chart - Light Conditions</option>
+                    <option value="environment_conditions">Bar Chart - Environmental Conditions</option>
+                    <option value="severity_weather">Scatter Plot - Severity vs Weather</option>
+                    <option value="hourly_accidents">Number of Accidents by Hour of the Day</option>
+                    <option value="accidents_by_location">Percentage of Accidents by Location</option>
+                    <option value="traffic_control">Percentage of Accidents by Traffic Control</option>
+                    <option value="Heatmap_of_Accidents">Heatmap of Accidents by Location and Traffic Control</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="analysis">Statistical Analyses:</label>
+                <select name="analysis" id="analysis">
+                    <option value="">-- Select --</option>
+                    <option value="snow_test">Snow vs No Snow (T-Test)</option>
+                    <option value="precip_test">Precipitation (T-Test)</option>
+                    <option value="correlation_analysis">Correlation Analysis</option>
+                    <option value="regression_analysis">Linear Regression</option>
+                </select>
+            </div>
+
+            <button type="submit">Generate</button>
+        </div>
+    </form>
+    <div class="note">Note: Heatmap will open in a separate tab for best experience.</div>
+
+    <!-- Rendered visualization or analysis output -->
+    <div id="visualization">
+        {{ visualization|safe }}
+        {% if stats_output %}
+            <h3>📈 Statistical Output</h3>
+            <pre>{{ stats_output }}</pre>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Script for dynamic line chart -->
+<script>
+    function updateChart(severity) {
+        fetch(`/api/linechart?severity=${severity}`)
+            .then(res => res.json())
+            .then(data => {
+                const dates = data.map(d => d.date);
+                const counts = data.map(d => d.accident_count);
+                Plotly.newPlot('line-chart', [{
+                    x: dates,
+                    y: counts,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    marker: { color: '#e74c3c' }
+                }], {
+                    title: `Accidents Over Time (${severity === 'all' ? 'All Severities' : severity})`,
+                    xaxis: { title: 'Date' },
+                    yaxis: { title: 'Number of Accidents' }
                 });
+            });
+    }
+
+    document.getElementById('severity').addEventListener('change', function () {
+        updateChart(this.value);
+    });
+
+    // Load the default chart on page load
+    updateChart('all');
+
+    // Open heatmap in new tab instead of form submission
+    document.getElementById('viz-form').addEventListener('submit', function (e) {
+        const selectedViz = document.getElementById('viz').value;
+        if (selectedViz === 'heatmap') {
+            window.open('/heatmap', '_blank');
+            e.preventDefault(); // Prevent form from submitting
         }
+    });
+</script>
 
-        document.getElementById('severity').addEventListener('change', function () {
-            updateChart(this.value);
-        });
-
-        // Load initial chart
-        updateChart('all');
-    </script>
 </body>
 </html>

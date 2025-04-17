@@ -1,148 +1,342 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, request, jsonify
 import sqlite3
 import pandas as pd
-import plotly.express as px
-import folium
-from folium.plugins import HeatMap
+from scipy import stats
+import statsmodels.api as sm
 import seaborn as sns
 import matplotlib.pyplot as plt
 import io
 import base64
+import folium
+from folium.plugins import HeatMap
 
 app = Flask(__name__)
 
-# === DATABASE CONNECTION ===
 def get_db_connection():
     conn = sqlite3.connect('accidents.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-# === ROUTES ===
-
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    visualization_html = ''
+    stats_output = ''
 
-# --- API: Line Chart Data ---
+    # --- Calculate Injury Totals (always) ---
+    conn = get_db_connection()
+    injury_query = '''
+        SELECT severity, COUNT(*) as count
+        FROM accidents_data
+        WHERE severity IS NOT NULL
+        GROUP BY severity
+    '''
+    df_injuries = pd.read_sql_query(injury_query, conn)
+    conn.close()
+
+    # Initialize dictionary with all keys
+    injury_totals = {
+        'Minimal': 0,
+        'Minor': 0,
+        'Major': 0,
+        'Fatal': 0
+    }
+
+    for _, row in df_injuries.iterrows():
+        sev = row['severity'].strip() if row['severity'] else 'Unknown'
+        if sev.startswith('01'):
+            injury_totals['Minimal'] += row['count']
+        elif sev.startswith('02'):
+            injury_totals['Minor'] += row['count']
+        elif sev.startswith('03'):
+            injury_totals['Major'] += row['count']
+        elif sev.startswith('04'):
+            injury_totals['Fatal'] += row['count']
+        else:
+            continue
+
+    # --- Handle Form POST ---
+    if request.method == 'POST':
+        selected_viz = request.form.get('viz')
+        selected_analysis = request.form.get('analysis')
+
+        if selected_viz == 'histogram':
+            conn = get_db_connection()
+            df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn)
+            conn.close()
+            plt.figure(figsize=(10, 6))
+            sns.histplot(df['no__of_vehicles'], bins=10, kde=True)
+            plt.title("Number of Vehicles Involved in Accidents")
+
+        elif selected_viz == 'top_dates':
+            conn = get_db_connection()
+            query = '''SELECT accident_date, COUNT(*) as accident_count FROM accident_details
+                       GROUP BY accident_date ORDER BY accident_count DESC LIMIT 10;'''
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+            plt.figure(figsize=(10, 6))
+            plt.barh(df['accident_date'], df['accident_count'], color='skyblue')
+            plt.title('Top 10 Dates with Most Accidents')
+            plt.xlabel('Number of Accidents')
+            plt.ylabel('Date')
+            plt.tight_layout()
+
+        elif selected_viz == 'light_conditions':
+            conn = get_db_connection()
+            query = '''SELECT light, COUNT(*) as accident_count FROM accident_details
+                       GROUP BY light ORDER BY accident_count DESC;'''
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+            plt.figure(figsize=(8, 8))
+            plt.pie(df['accident_count'], labels=df['light'], autopct='%1.1f%%', startangle=140)
+            plt.title('Number of Accidents by Light Conditions')
+            plt.tight_layout()
+
+        elif selected_viz == 'environment_conditions':
+            conn = get_db_connection()
+            query = '''SELECT environment_condition, COUNT(*) as accident_count
+                       FROM accident_details GROUP BY environment_condition ORDER BY accident_count DESC;'''
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+            plt.figure(figsize=(10, 6))
+            plt.bar(df['environment_condition'], df['accident_count'], color='lightblue')
+            plt.title('Accidents by Environmental Conditions')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+        elif selected_viz == 'severity_weather':
+            conn = get_db_connection()
+            query = '''SELECT severity, tavg, prcp FROM accidents_data
+                       JOIN weather_data ON accidents_data.date = weather_data.date;'''
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+            df = df.dropna()
+            plt.figure(figsize=(10, 6))
+            plt.scatter(df['tavg'], df['severity'], alpha=0.6, c=df['prcp'], cmap='viridis')
+            plt.colorbar(label='Precipitation')
+            plt.title('Severity vs Average Temperature')
+            plt.xlabel('Temperature (°C)')
+            plt.ylabel('Severity')
+            plt.tight_layout()
+
+        #Demilade code 
+        elif selected_viz == 'hourly_accidents':
+            conn = get_db_connection()
+            query = """SELECT * FROM accident_details"""
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            # Convert 'accident_time' to datetime and extract the hour of the day
+            df['accident_time'] = pd.to_datetime(df['accident_time'], format='%I:%M %p', errors='coerce')
+            df['hour_of_day'] = df['accident_time'].dt.hour
+
+            # Plot number of accidents by hour
+            plt.figure(figsize=(10, 6))
+            sns.countplot(x='hour_of_day', data=df, hue='hour_of_day', palette='viridis', legend=False)
+            plt.title('Number of Accidents by Hour of the Day')
+            plt.xlabel('Hour of the Day')
+            plt.ylabel('Accident Count')
+            plt.xticks(range(0, 24))
+            plt.tight_layout()
+
+        elif selected_viz == 'accidents_by_location':
+            conn = get_db_connection()
+            query = """SELECT * FROM accident_details;"""
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            total = len(df)
+            plt.figure(figsize=(10, 6))
+            ax = sns.countplot(x='accident_location', data=df, palette='viridis')
+            plt.title('Percentage of Accidents by Location')
+            plt.xlabel('Accident Location')
+            plt.ylabel('Percentage of Total Accidents (%)')
+
+            # Add percentage labels
+            for p in ax.patches:
+                count = p.get_height()
+                percent = (count / total) * 100
+                ax.annotate(f'{percent:.1f}%', 
+                            (p.get_x() + p.get_width() / 2., count),
+                            ha='center', va='bottom', fontsize=10, color='black', xytext=(0, 3), textcoords='offset points')
+
+            # Set y-ticks as percentage
+            yticks = ax.get_yticks()
+            ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
+            plt.xticks(rotation=15, ha='right')
+            plt.tight_layout()
+
+        elif selected_viz == 'traffic_control':
+            conn = get_db_connection()
+            query = """SELECT * FROM accident_details;"""
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            total = len(df)
+            plt.figure(figsize=(10, 6))
+            ax = sns.countplot(x='traffic_control', data=df, palette='viridis')
+            plt.title('Percentage of Accidents by Traffic Control')
+            plt.xlabel('Traffic Control')
+            plt.ylabel('Percentage of Total Accidents (%)')
+
+            # Add percentage labels
+            for p in ax.patches:
+                count = p.get_height()
+                percent = (count / total) * 100
+                ax.annotate(f'{percent:.1f}%',
+                            (p.get_x() + p.get_width() / 2., count),
+                            ha='center', va='bottom', fontsize=10, color='black', xytext=(0, 3), textcoords='offset points')
+
+            # Set y-ticks as percentage
+            yticks = ax.get_yticks()
+            ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
+
+            plt.tight_layout()
+
+        elif selected_viz == 'Heatmap_of_Accidents':
+            conn = get_db_connection()
+            query = """SELECT * FROM accident_details;"""
+            df = pd.read_sql_query(query, conn)
+            # Group and count accidents
+            grouped = df.groupby(['accident_location', 'traffic_control']).size().reset_index(name='accident_count')
+
+            # Pivot to matrix format
+            heatmap_data = grouped.pivot(index='accident_location', columns='traffic_control', values='accident_count').fillna(0)
+
+            # Plot heatmap with coolwarm color palette
+            plt.figure(figsize=(12, 8))
+            sns.heatmap(heatmap_data, annot=True, fmt='.0f', cmap='coolwarm', linewidths=0.5, cbar_kws={'label': 'Number of Accidents'})
+
+            # Labels and titles
+            plt.title('Heatmap of Accidents by Location and Traffic Control', fontsize=14)
+            plt.xlabel('Traffic Control', fontsize=12)
+            plt.ylabel('Accident Location', fontsize=12)
+            plt.xticks(rotation=30, ha='right')
+            plt.yticks(rotation=0)
+            plt.tight_layout()
+
+        elif selected_viz == 'traffic_control':
+            conn = get_db_connection()
+            query = """SELECT * FROM accident_details;"""
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            total = len(df)
+            plt.figure(figsize=(10, 6))
+            ax = sns.countplot(x='traffic_control', data=df, palette='viridis')
+            plt.title('Percentage of Accidents by Traffic Control')
+            plt.xlabel('Traffic Control')
+            plt.ylabel('Percentage of Total Accidents (%)')
+
+            # Add percentage labels
+            for p in ax.patches:
+                count = p.get_height()
+                percent = (count / total) * 100
+                ax.annotate(f'{percent:.1f}%',
+                            (p.get_x() + p.get_width() / 2., count),
+                            ha='center', va='bottom', fontsize=10, color='black', xytext=(0, 3), textcoords='offset points')
+
+            # Set y-ticks as percentage
+            yticks = ax.get_yticks()
+            ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
+
+            plt.tight_layout()
+
+
+        if selected_viz and selected_viz != 'heatmap':
+            img = io.BytesIO()
+            plt.savefig(img, format='png')
+            img.seek(0)
+            plot_url = base64.b64encode(img.getvalue()).decode()
+            plt.close()
+            visualization_html = f'<img src="data:image/png;base64,{plot_url}"/>'
+
+        elif selected_viz == 'heatmap':
+            conn = get_db_connection()
+            df = pd.read_sql('SELECT latitude, longitude FROM accidents_data', conn)
+            conn.close()
+            m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=12)
+            HeatMap(df[['latitude', 'longitude']].values.tolist()).add_to(m)
+            visualization_html = m.get_root().render()
+        
+        
+
+        # ---- STATISTICAL SECTION ----
+        if selected_analysis == 'snow_test':
+            conn = get_db_connection()
+            snow = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
+                                  JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow > 0''', conn)
+            no_snow = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
+                                     JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow = 0''', conn)
+            conn.close()
+            t_stat, p_val = stats.ttest_ind(snow['no__of_vehicles'], no_snow['no__of_vehicles'])
+            stats_output = f"Snow vs No Snow → T: {t_stat:.2f}, P: {p_val:.5f}"
+
+        elif selected_analysis == 'precip_test':
+            conn = get_db_connection()
+            wet = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
+                                 JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.prcp > 0''', conn)
+            dry = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
+                                 JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.prcp = 0''', conn)
+            conn.close()
+            t_stat, p_val = stats.ttest_ind(wet['no__of_vehicles'], dry['no__of_vehicles'])
+            stats_output = f"Precipitation vs No Precipitation → T: {t_stat:.2f}, P: {p_val:.5f}"
+
+        elif selected_analysis == 'correlation_analysis':
+            conn = get_db_connection()
+            df = pd.read_sql('''SELECT wd.tavg, wd.wspd, wd.snow, wd.prcp, ad.no__of_fatal
+                                FROM accident_details ad JOIN weather_data wd ON ad.accident_date = wd.date''', conn)
+            conn.close()
+            corr = df.corr(numeric_only=True)
+            plt.figure(figsize=(8, 6))
+            sns.heatmap(corr, annot=True, cmap='coolwarm')
+            plt.title('Correlation: Weather vs Fatalities')
+            img = io.BytesIO()
+            plt.savefig(img, format='png')
+            img.seek(0)
+            plot_url = base64.b64encode(img.getvalue()).decode()
+            plt.close()
+            visualization_html = f'<img src="data:image/png;base64,{plot_url}"/>'
+
+        elif selected_analysis == 'regression_analysis':
+            conn = get_db_connection()
+            df = pd.read_sql('''SELECT wd.tavg, wd.wspd, wd.snow, wd.prcp, ad.no__of_fatal
+                                FROM accident_details ad JOIN weather_data wd ON ad.accident_date = wd.date
+                                WHERE wd.tavg IS NOT NULL''', conn)
+            conn.close()
+            df.dropna(inplace=True)
+            X = sm.add_constant(df[['tavg', 'wspd', 'snow', 'prcp']])
+            y = df['no__of_fatal']
+            model = sm.OLS(y, X).fit()
+            stats_output = model.summary().as_text()
+
+    return render_template(
+        'index.html',
+        visualization=visualization_html,
+        stats_output=stats_output,
+        injury_totals=injury_totals
+    )
 
 @app.route('/api/linechart')
 def api_line_chart():
-    severity = request.args.get('severity', 'all')  # Get severity filter from URL
-
+    severity = request.args.get('severity', 'all')
     conn = get_db_connection()
-
     if severity == 'all':
-        query = '''
-            SELECT date, COUNT(*) as accident_count
-            FROM accidents_data
-            GROUP BY date
-        '''
-        df = pd.read_sql(query, conn)
-
+        df = pd.read_sql('SELECT date, COUNT(*) as accident_count FROM accidents_data GROUP BY date', conn)
     elif severity == 'blank':
-        query = '''
-            SELECT date, COUNT(*) as accident_count
-            FROM accidents_data
-            WHERE severity IS NULL OR TRIM(severity) = ''
-            GROUP BY date
-        '''
-        df = pd.read_sql(query, conn)
-
+        df = pd.read_sql('SELECT date, COUNT(*) as accident_count FROM accidents_data WHERE severity IS NULL OR TRIM(severity) = "" GROUP BY date', conn)
     else:
-        query = '''
-            SELECT date, COUNT(*) as accident_count
-            FROM accidents_data
-            WHERE severity = ?
-            GROUP BY date
-        '''
-        df = pd.read_sql(query, conn, params=(severity,))
-
+        df = pd.read_sql('SELECT date, COUNT(*) as accident_count FROM accidents_data WHERE severity = ? GROUP BY date', conn, params=(severity,))
     conn.close()
     return jsonify(df.to_dict(orient='records'))
 
-# --- API: Box Plot Data ---
-@app.route('/api/boxplot')
-def api_box_plot():
-    conn = get_db_connection()
-    df = pd.read_sql('SELECT severity, road_surface FROM traffic_data', conn)
-    conn.close()
-    return jsonify(df.to_dict(orient='records'))
-
-# --- API: Histogram Data ---
-@app.route('/api/histogram')
-def api_histogram():
-    conn = get_db_connection()
-    df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn)
-    conn.close()
-    return jsonify(df.to_dict(orient='records'))
-
-# === VISUAL ROUTES ===
-
-# --- LINE CHART (HTML Page) ---
-
-@app.route('/linechart')
-def line_chart():
-    conn = get_db_connection()
-    df = pd.read_sql('SELECT date, COUNT(*) AS accident_count FROM accidents_data GROUP BY date', conn)
-    conn.close()
-    fig = px.line(df, x='date', y='accident_count', title='Accident Trends Over Time')
-    return fig.to_html()
-
-# --- HEATMAP ---
 @app.route('/heatmap')
 def heatmap():
     conn = get_db_connection()
     df = pd.read_sql('SELECT latitude, longitude FROM accidents_data', conn)
     conn.close()
+    m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=11)
+    HeatMap(df[['latitude', 'longitude']].values.tolist()).add_to(m)
+    return m.get_root().render()
 
-    m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=12)
-    heat_data = [[row['latitude'], row['longitude']] for _, row in df.iterrows()]
-    HeatMap(heat_data).add_to(m)
-    m.save('templates/heatmap.html')
-
-    return render_template('heatmap.html')
-
-# --- BOXPLOT (Rendered Chart) ---
-@app.route('/boxplot')
-def boxplot():
-    conn = get_db_connection()
-    # Fetching data from the correct column 'road_surface' in traffic_data table
-    df = pd.read_sql('SELECT severity, road_surface FROM traffic_data', conn)
-    conn.close()
-
-    # Create the boxplot
-    plt.figure(figsize=(20, 10))
-    sns.boxplot(data=df, x='road_surface', y='severity')  # Use 'road_surface' instead of 'road_surface_condition'
-    plt.title("Accident Severity by Road Surface")
-
-    # Saving the plot to a byte stream to render as an image
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
-    plt.close()
-
-    return f'<img src="data:image/png;base64,{plot_url}"/>'
-
-# --- HISTOGRAM (Rendered Chart) ---
-@app.route('/histogram')
-def histogram():
-    conn = get_db_connection()
-    df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn)
-    conn.close()
-
-    plt.figure(figsize=(10, 6))
-    sns.histplot(df['no__of_vehicles'], bins=10, kde=True)
-    plt.title("Number of Vehicles Involved in Accidents")
-
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
-    plt.close()
-
-    return f'<img src="data:image/png;base64,{plot_url}"/>'
-
-# === APP ENTRY POINT ===
 if __name__ == '__main__':
     app.run(debug=True)
