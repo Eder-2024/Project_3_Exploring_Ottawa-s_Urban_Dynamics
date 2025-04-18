@@ -164,10 +164,6 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 ## Recommendations:
 - xxx
 
----
-
-## ✅ Conclusion & Application by End User
-
 ### 🚔 1. Police & Traffic Enforcement
 - **Insight:** Snow conditions significantly increase accident volume.
 - **Action:**
