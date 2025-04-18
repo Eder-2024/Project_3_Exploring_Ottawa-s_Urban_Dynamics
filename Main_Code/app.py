@@ -9,6 +9,11 @@ import io
 import base64
 import folium
 from folium.plugins import HeatMap
+from folium.plugins import MarkerCluster
+from matplotlib import cm
+
+
+
 
 app = Flask(__name__)
 
@@ -31,7 +36,39 @@ def index():
         GROUP BY severity
     '''
     df_injuries = pd.read_sql_query(injury_query, conn)
+    map_df = pd.read_sql('SELECT latitude, longitude FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL', conn)
     conn.close()
+
+    if not map_df.empty:
+        map_center = [map_df['latitude'].mean(), map_df['longitude'].mean()]
+        traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='CartoDB positron')
+    
+    # fetch severity from the DB here
+        conn = get_db_connection()
+        df = pd.read_sql_query("SELECT date, latitude, longitude, severity FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL", conn)
+        conn.close()
+
+        severities = df['severity'].unique()
+
+        for severity in severities:
+            fg = folium.FeatureGroup(name=f"Severity: {severity}")
+            cluster = MarkerCluster()
+            for _, row in df[df['severity'] == severity].iterrows():
+                folium.Marker(
+                    location=[row['latitude'], row['longitude']],
+                    popup=f"Date: {row['date']}<br>Severity: {row['severity']}",
+                    icon=folium.Icon(color="red" if severity.lower() == "severe"
+                                    else "orange" if severity.lower() == "moderate"
+                                    else "green")
+                ).add_to(cluster)
+            fg.add_child(cluster)
+            traffic_map.add_child(fg)
+
+        folium.LayerControl().add_to(traffic_map)
+        map_html = traffic_map._repr_html_()
+    else:
+        map_html = "<p>No accident data with coordinates found.</p>"
+
 
     # Initialize dictionary with all keys
     injury_totals = {
@@ -59,35 +96,28 @@ def index():
         selected_viz = request.form.get('viz')
         selected_analysis = request.form.get('analysis')
 
-        if selected_viz == 'histogram':
-            conn = get_db_connection()
-            df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn)
-            conn.close()
-            plt.figure(figsize=(10, 6))
-            sns.histplot(df['no__of_vehicles'], bins=10, kde=True)
+        if selected_viz == 'histogram': 
+            conn = get_db_connection() 
+            df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn) 
+            conn.close() 
+            plt.figure(figsize=(10, 6)) 
+            sns.histplot(df['no__of_vehicles'], bins=10, kde=True) 
             plt.title("Number of Vehicles Involved in Accidents")
-
-        elif selected_viz == 'top_dates':
-            conn = get_db_connection()
-            query = '''SELECT accident_date, COUNT(*) as accident_count FROM accident_details
-                       GROUP BY accident_date ORDER BY accident_count DESC LIMIT 10;'''
-            df = pd.read_sql_query(query, conn)
-            conn.close()
-            plt.figure(figsize=(10, 6))
-            plt.barh(df['accident_date'], df['accident_count'], color='skyblue')
-            plt.title('Top 10 Dates with Most Accidents')
-            plt.xlabel('Number of Accidents')
-            plt.ylabel('Date')
-            plt.tight_layout()
 
         elif selected_viz == 'light_conditions':
             conn = get_db_connection()
             query = '''SELECT light, COUNT(*) as accident_count FROM accident_details
-                       GROUP BY light ORDER BY accident_count DESC;'''
+                    GROUP BY light ORDER BY accident_count DESC;'''
             df = pd.read_sql_query(query, conn)
             conn.close()
             plt.figure(figsize=(8, 8))
-            plt.pie(df['accident_count'], labels=df['light'], autopct='%1.1f%%', startangle=140)
+
+            # Generate colors using the 'viridis' colormap
+            
+            cmap = cm.get_cmap('viridis')
+            colors = [cmap(i / len(df)) for i in range(len(df))]
+
+            plt.pie(df['accident_count'], labels=df['light'], autopct='%1.1f%%', startangle=140, colors=colors)
             plt.title('Number of Accidents by Light Conditions')
             plt.tight_layout()
 
@@ -313,9 +343,9 @@ def index():
         'index.html',
         visualization=visualization_html,
         stats_output=stats_output,
-        injury_totals=injury_totals
+        injury_totals=injury_totals,
+        map_html=map_html  
     )
-
 @app.route('/api/linechart')
 def api_line_chart():
     severity = request.args.get('severity', 'all')
@@ -337,6 +367,69 @@ def heatmap():
     m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=11)
     HeatMap(df[['latitude', 'longitude']].values.tolist()).add_to(m)
     return m.get_root().render()
+
+@app.route('/map', methods=['GET'])
+def map_view():
+    # Generate the map
+    conn = get_db_connection()
+    query = """
+    SELECT date, latitude, longitude, severity
+    FROM accidents_data
+    WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+    """
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+
+    map_center = [df['latitude'].mean(), df['longitude'].mean()]
+    traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='CartoDB positron')
+    severities = df['severity'].unique()
+
+    for severity in severities:
+        fg = folium.FeatureGroup(name=f"Severity: {severity}")
+        cluster = MarkerCluster()
+        for _, row in df[df['severity'] == severity].iterrows():
+            folium.Marker(
+                location=[row['latitude'], row['longitude']],
+                popup=f"Date: {row['date']}<br>Severity: {row['severity']}",
+                icon=folium.Icon(
+                                color="red" if severity.lower() == "severe"
+                                            else "orange" if severity.lower() == "moderate"
+                                            else "green"  
+)
+            ).add_to(cluster)
+        fg.add_child(cluster)
+        traffic_map.add_child(fg)
+
+    folium.LayerControl().add_to(traffic_map)
+    map_html = traffic_map._repr_html_()
+
+
+    return render_template('map.html', map_html=map_html)
+
+@app.route('/api/top_dates')
+def api_top_dates():
+    conn = get_db_connection()
+    query = '''
+        SELECT accident_date, COUNT(*) as accident_count 
+        FROM accident_details 
+        GROUP BY accident_date 
+        ORDER BY accident_count DESC 
+        LIMIT 10;
+    '''
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+
+    # Convert to datetime safely
+    df['accident_date'] = pd.to_datetime(df['accident_date'])
+
+    # Format the output
+    result = [{
+        'date': row['accident_date'].strftime('%b %d, %Y'),
+        'count': row['accident_count']
+    } for _, row in df.iterrows()]
+
+    return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

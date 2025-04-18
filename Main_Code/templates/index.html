@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ottawa Accident Data Visualization Dashboard (2020)</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -55,7 +56,24 @@
             background-color: #2980b9;
         }
 
-        #line-chart {
+        .charts-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .chart {
+            flex: 1;
+            min-width: 45%;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #map {
             height: 500px;
             margin-top: 30px;
             background-color: white;
@@ -105,37 +123,64 @@
             font-family: monospace;
             overflow-x: auto;
         }
+
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .charts-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .chart {
+                min-width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🚗 Ottawa Accident Data Visualization Dashboard (2020)</h1>
+    
     <div class="injury-boxes">
         <div class="injury-box">🟢 Minimal Injuries: {{ injury_totals['Minimal'] }}</div>
         <div class="injury-box">🟡 Minor Injuries: {{ injury_totals['Minor'] }}</div>
         <div class="injury-box">🟠 Major Injuries: {{ injury_totals['Major'] }}</div>
         <div class="injury-box">🔴 Fatal Injuries: {{ injury_totals['Fatal'] }}</div>
-    
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <!-- Top Dates Chart -->
+        <div id="top-dates-chart" class="chart"></div>
+
+        <!-- Line Chart -->
+        <div id="line-chart" class="chart"></div>
+
     </div>
 
     <!-- Severity filter -->
-    <div class="chart-row">
-        <div class="chart-spacer"></div>
-        <div class="chart-box">
-            <div class="form-group">
-                <label for="severity">Select Severity:</label>
-                <select id="severity">
-                    <option value="all">All</option>
-                    <option value="01 - Minimal">Minimal</option>
-                    <option value="02 - Minor">Minor</option>
-                    <option value="03 - Major">Major</option>
-                    <option value="04 - Fatal">Fatal</option>
-                    <!-- Removed "Unknown" as requested earlier -->
-                </select>
-            </div>
-    
-            <div id="line-chart"></div>
+    <div class="form-group">
+        <label for="severity">Select Severity:</label>
+        <select id="severity">
+            <option value="all">All</option>
+            <option value="01 - Minimal">Minimal</option>
+            <option value="02 - Minor">Minor</option>
+            <option value="03 - Major">Major</option>
+            <option value="04 - Fatal">Fatal</option>
+        </select>
+    </div>
+
+    <!-- Map Embed Section -->
+    <div id="map-wrapper">
+        <h3>🗺️ Accident Map</h3>
+        <div id="map-container">
+            {{ map_html|safe }}
         </div>
     </div>
 
@@ -149,7 +194,6 @@
                     <option value="">-- Select --</option>
                     <option value="histogram">Histogram</option>
                     <option value="heatmap">Heatmap 🌍 (opens in new tab)</option>
-                    <option value="top_dates">Top 10 Dates with Most Accidents</option>
                     <option value="light_conditions">Pie Chart - Light Conditions</option>
                     <option value="environment_conditions">Bar Chart - Environmental Conditions</option>
                     <option value="severity_weather">Scatter Plot - Severity vs Weather</option>
@@ -186,34 +230,74 @@
     </div>
 </div>
 
-<!-- Script for dynamic line chart -->
+<!-- Script for dynamic charts -->
 <script>
+    // Update chart based on severity selection
     function updateChart(severity) {
-        fetch(`/api/linechart?severity=${severity}`)
-            .then(res => res.json())
-            .then(data => {
-                const dates = data.map(d => d.date);
-                const counts = data.map(d => d.accident_count);
-                Plotly.newPlot('line-chart', [{
-                    x: dates,
-                    y: counts,
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    marker: { color: '#e74c3c' }
-                }], {
-                    title: `Accidents Over Time (${severity === 'all' ? 'All Severities' : severity})`,
-                    xaxis: { title: 'Date' },
-                    yaxis: { title: 'Number of Accidents' }
-                });
-            });
-    }
+    fetch(`/api/linechart?severity=${severity}`)
+        .then(res => res.json())
+        .then(data => {
+            const dates = data.map(d => d.date);
+            const counts = data.map(d => d.accident_count);
 
-    document.getElementById('severity').addEventListener('change', function () {
-        updateChart(this.value);
-    });
+            Plotly.newPlot('line-chart', [{
+                x: dates,
+                y: counts,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {
+                    color: counts,  // Link color to the counts array
+                    colorscale: 'Viridis',  // Use the Viridis color scale
+                    showscale: true  // Show the color scale on the chart
+                }
+            }], {
+                title: `Accidents Over Time (${severity === 'all' ? 'All Severities' : severity})`,
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Number of Accidents' }
+            });
+        });
+}
+
+document.getElementById('severity').addEventListener('change', function () {
+    updateChart(this.value);
+});
 
     // Load the default chart on page load
     updateChart('all');
+
+    // Load top 10 accident dates chart
+    function loadTopDatesChart() {
+    fetch('/api/top_dates')
+        .then(res => res.json())
+        .then(data => {
+            const dates = data.map(item => item.date);  // these are raw date strings like '2020-08-15'
+            const counts = data.map(item => item.count);
+
+            Plotly.newPlot('top-dates-chart', [{
+                y: dates,
+                x: counts,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: counts,  // This links the color to the count values
+                    colorscale: 'Viridis',  // Use the Viridis color scale
+                    showscale: true  // This shows the color scale
+                }
+            }], {
+                title: 'Top 10 Dates with Most Accidents',
+                xaxis: { title: 'Number of Accidents' },
+                yaxis: {
+                    title: 'Date',
+                    type: 'category'  // <-- This is the key fix
+                },
+                margin: { l: 120 }
+            });
+        });
+}
+
+// Load it on page load
+loadTopDatesChart();
+
 
     // Open heatmap in new tab instead of form submission
     document.getElementById('viz-form').addEventListener('submit', function (e) {

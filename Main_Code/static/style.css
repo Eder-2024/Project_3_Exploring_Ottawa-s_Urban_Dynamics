@@ -43,3 +43,13 @@ chart-row {
   flex: 1;
   max-width: 650px;
 }
+
+#map-wrapper {
+  margin-top: 30px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
