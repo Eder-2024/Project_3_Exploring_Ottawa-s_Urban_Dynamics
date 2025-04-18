@@ -1,7 +1,7 @@
 # 🚦 Ottawa Traffic Collision & Weather Insight Analysis (2020)
 ## Group 5 – *The Code Enforcers* 🚗💨
 
-### 🧰 **Libraries Used**
+###**Libraries Used**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flask-%23000.svg?style=for-the-badge&logo=Flask&logoColor=white" />
@@ -69,16 +69,6 @@ Merged on date to correlate weather with accidents.
 
 ---
 
-### 📈 Key Visualizations
-
-- **📍 Collision Heatmap (Folium):** Shows Ottawa’s top accident-prone locations.
-- **📊 Time-of-Day Collision Histogram:** Pinpoints morning and evening rush-hour danger zones.
-- **🧊 Weather vs. Accident Trend Line (Viridis):** Highlights increased risk during snowy, foggy, or icy days.
-- **📅 Day-of-Week Boxplots:** Reveals peak collision days and how consistent they are weekly.
-- **🕓 Interactive Time Slider (HTML/Flask Optional):** Lets users select time and view associated risks.
-
----
-
 ## 🛠️ Installation & Setup
 ---
 ### 1. Clone the Repository
@@ -129,16 +119,16 @@ Populate it with your data accordingly.
 python app.py
 ```
 
-Then go to `http://127.0.0.1:5000` in your browser.
+### Then go to `http://127.0.0.1:5000` in your browser.
 ---
 
-# 📉 Summary Findings 📈
+## 📉 Summary Findings 📈
 
-# Summary of Statistical Analysis 
+## Summary of Statistical Analysis 
 
-## Objectives: xxx
+### Objectives: xxx
 
-# ❄️ Snow & Precipitation Impact (T-Tests)
+## Snow & Precipitation Impact (T-Tests)
 
 Snow and precipitation significantly affect the number of vehicles involved in accidents:
 
@@ -148,7 +138,7 @@ Snow and precipitation significantly affect the number of vehicles involved in a
 
 ---
 
-## 🌧️ Weather & Fatalities (Linear Regression)
+## Weather & Fatalities (Linear Regression)
 
 All weather variables (tavg, wspd, prcp, snow) show statistically significant effects on the number of fatalities. 
 
@@ -167,7 +157,7 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 - Suggests that fatal accident severity is not strongly weather-dependent in your current dataset — could be due to limited variance or sample size.
 
 
-# Summary of Visualisation Charts 
+## Summary of Visualisation Charts 
 - xxx
 --
 
@@ -176,49 +166,48 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 
 ---
 
-### ✅ Conclusion & Application by End User
+## ✅ Conclusion & Application by End User
 
-#### 🚔 1. Police & Traffic Enforcement
+### 🚔 1. Police & Traffic Enforcement
 - **Insight:** Snow conditions significantly increase accident volume.
 - **Action:**
   - Increase patrols during snowfall and icy conditions.
   - Set up temporary enforcement zones or automated alerts during winter storms.
   - Consider more frequent DUI checks or speed traps during risky weather conditions.
 
-#### 🌆 2. Urban Planners & Local Councils
+### 🌆 2. Urban Planners & Local Councils
 - **Insight:** Snowy conditions result in more accidents, but fatalities don’t vary much between warm/cold.
 - **Action:**
   - Improve road treatment and drainage in high-snowfall zones.
   - Add smart traffic signals that adapt to weather inputs.
   - Prioritize infrastructure upgrades in areas with high vehicle counts during snow.
 
-#### 🚑 3. Emergency Services
+### 🚑 3. Emergency Services
 - **Insight:** Snow and precipitation correlate with more multi-vehicle accidents.
 - **Action:**
   - Route EMS services to avoid congested accident-prone roads during snowstorms.
   - Use predictive weather data to staff accordingly for expected spikes in accidents.
 
-#### 📢 4. Educational Campaigns
+### 📢 4. Educational Campaigns
 - **Insight:** Accident counts rise during snow, even if fatalities don’t.
 - **Action:**
   - Focus campaigns on defensive driving in winter.
   - Promote messages like: "Just because it’s not fatal doesn’t mean it’s safe."
   - Run these campaigns ahead of snowy seasons.
 
-#### 🧠 5. Data for Research & Innovation
+### 🧠 5. Data for Research & Innovation
 - **Insight:** Strong statistical relationship between snow and accident counts, but weak link with fatality variation.
 - **Action:**
   - Use this as a foundation for machine learning models predicting accident risk.
   - Feed into smart city simulations and test how autonomous vehicles behave in snow/precipitation scenarios.
 
-#### 🏢 6. Businesses & Logistics
+### 🏢 6. Businesses & Logistics
 - **Insight:** Snow is a high-risk condition for delivery fleets.
 - **Action:**
   - Dynamically reroute trucks during snow events using weather-integrated GPS.
   - Adjust delivery windows and avoid sending vehicles during peak snow hours.
 
-
-
+---
 
 ### 🧭 Ethical Considerations
 
@@ -242,7 +231,6 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 - Eder Ortiz
 - Geraldine Valencia
 - Demilade Adenuga
-
 
 ---
 
