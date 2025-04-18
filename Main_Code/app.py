@@ -13,8 +13,6 @@ from folium.plugins import MarkerCluster
 from matplotlib import cm
 
 
-
-
 app = Flask(__name__)
 
 def get_db_connection():
@@ -148,7 +146,7 @@ def index():
             plt.ylabel('Severity')
             plt.tight_layout()
 
-        #Demilade code 
+        # Finding which time of the day had the most accidents 
         elif selected_viz == 'hourly_accidents':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
@@ -167,7 +165,8 @@ def index():
             plt.ylabel('Accident Count')
             plt.xticks(range(0, 24))
             plt.tight_layout()
-
+        
+        #Finding which location spots led to the accidents
         elif selected_viz == 'accidents_by_location':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details;"""
@@ -204,6 +203,7 @@ def index():
             plt.xticks(rotation=15, ha='right')
             plt.tight_layout()
 
+        # Finding the traffic control situation at the location spot of the accident
         elif selected_viz == 'traffic_control':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details;"""
@@ -241,6 +241,7 @@ def index():
 
             plt.tight_layout()
 
+        #Carry out a corelation heatmap of accidents location and traffic contol against accidents to know the scenarios that have led to the accidents
         elif selected_viz == 'Heatmap_of_Accidents':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details;"""
@@ -263,6 +264,7 @@ def index():
             plt.yticks(rotation=0)
             plt.tight_layout()
 
+        # Rule of elimination - could the weather be the cause of a high number of accidents during a certain period of the year?
         elif selected_viz == 'Daily_Accidents_by_Weather':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
@@ -286,6 +288,7 @@ def index():
             plt.legend(title='Weather Type', bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.tight_layout()
 
+        # Finding out the prominent day that accidents highly occur.
         elif selected_viz == 'Number_of_Accidents_by_Day':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
