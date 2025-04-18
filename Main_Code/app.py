@@ -192,6 +192,15 @@ def index():
             # Set y-ticks as percentage
             yticks = ax.get_yticks()
             ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
+            handles, labels = ax.get_legend_handles_labels()
+            if not handles:
+                unique_locations = df['accident_location'].unique()
+                handles = [plt.Rectangle((0,0),1,1, color=color) for color in sns.color_palette('viridis', len(unique_locations))]
+                labels = unique_locations
+
+            plt.legend(handles, labels, title='Accident Location', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
             plt.xticks(rotation=15, ha='right')
             plt.tight_layout()
 
@@ -220,6 +229,16 @@ def index():
             yticks = ax.get_yticks()
             ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
 
+            # Clean and consistent x-axis labels
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=20, ha='right')
+
+            # Create a legend with color patches matching each category
+            unique_traffic = df['traffic_control'].unique()
+            colors = sns.color_palette('viridis', len(unique_traffic))
+            handles = [plt.Rectangle((0, 0), 1, 1, color=color) for color in colors]
+            plt.legend(handles, unique_traffic, title='Traffic Control', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
             plt.tight_layout()
 
         elif selected_viz == 'Heatmap_of_Accidents':
@@ -244,33 +263,56 @@ def index():
             plt.yticks(rotation=0)
             plt.tight_layout()
 
-        elif selected_viz == 'traffic_control':
+        elif selected_viz == 'Daily_Accidents_by_Weather':
             conn = get_db_connection()
-            query = """SELECT * FROM accident_details;"""
+            query = """SELECT * FROM accident_details"""
             df = pd.read_sql_query(query, conn)
             conn.close()
 
-            total = len(df)
-            plt.figure(figsize=(10, 6))
-            ax = sns.countplot(x='traffic_control', data=df, palette='viridis')
-            plt.title('Percentage of Accidents by Traffic Control')
-            plt.xlabel('Traffic Control')
-            plt.ylabel('Percentage of Total Accidents (%)')
-
-            # Add percentage labels
-            for p in ax.patches:
-                count = p.get_height()
-                percent = (count / total) * 100
-                ax.annotate(f'{percent:.1f}%',
-                            (p.get_x() + p.get_width() / 2., count),
-                            ha='center', va='bottom', fontsize=10, color='black', xytext=(0, 3), textcoords='offset points')
-
-            # Set y-ticks as percentage
-            yticks = ax.get_yticks()
-            ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
-
+            # Force conversion of collision_time to datetime format
+            df['accident_date'] = pd.to_datetime(df['accident_date'], errors='coerce')
+            # Drop rows where datetime conversion failed (optional but helps)
+            df = df.dropna(subset=['accident_date'])
+            # Now extract date again for grouping
+            df['date'] = df['accident_date'].dt.date
+            daily_weather_collisions = df.groupby(['date', 'environment_condition']).size().unstack().fillna(0)
+            # Plot the trend over time
+            plt.figure(figsize=(12, 6))
+            daily_weather_collisions.plot(kind='line', figsize=(12, 6), marker='o')
+            plt.title('Daily Accidents by Weather Condition in 2020')
+            plt.xlabel('Date')
+            plt.ylabel('Number of Accidents')
+            plt.xticks(rotation=45)
+            plt.legend(title='Weather Type', bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.tight_layout()
 
+        elif selected_viz == 'Number_of_Accidents_by_Day':
+            conn = get_db_connection()
+            query = """SELECT * FROM accident_details"""
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            # Ensure 'accident_date' is in datetime format
+            df['accident_date'] = pd.to_datetime(df['accident_date'], errors='coerce')
+            # Drop rows where date parsing failed
+            df = df.dropna(subset=['accident_date'])
+            # Extract day of the week
+            df['day_of_week'] = df['accident_date'].dt.day_name()
+            # Optional: Create an ordered category for plotting (Monday to Sunday)
+            days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            df['day_of_week'] = pd.Categorical(df['day_of_week'], categories=days_order, ordered=True)
+            # Count the number of accidents per day
+            day_counts = df['day_of_week'].value_counts().sort_index()
+            # Plot
+            plt.figure(figsize=(10, 6))
+            sns.barplot(x=day_counts.index, y=day_counts.values, palette='viridis')
+            plt.title('Number of Accidents by Day of the Week in 2020')
+            plt.xlabel('Day of the Week')
+            plt.ylabel('Number of Accidents')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+        
 
         if selected_viz and selected_viz != 'heatmap':
             img = io.BytesIO()
