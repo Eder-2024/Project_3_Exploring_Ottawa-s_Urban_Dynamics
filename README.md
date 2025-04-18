@@ -70,7 +70,6 @@ Merged on date to correlate weather with accidents.
 ---
 
 ## 🛠️ Installation & Setup
----
 ### 1. Clone the Repository
 
 ```bash
