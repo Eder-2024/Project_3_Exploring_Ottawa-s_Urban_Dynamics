@@ -294,12 +294,18 @@ def index():
         if selected_analysis == 'snow_test':
             conn = get_db_connection()
             snow = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
-                                  JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow > 0''', conn)
+                              JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow > 0''', conn)
             no_snow = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
-                                     JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow = 0''', conn)
+                                 JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow = 0''', conn)
             conn.close()
             t_stat, p_val = stats.ttest_ind(snow['no__of_vehicles'], no_snow['no__of_vehicles'])
-            stats_output = f"Snow vs No Snow → T: {t_stat:.2f}, P: {p_val:.5f}"
+
+            stats_output = {
+            'message': f"Snow vs No Snow → T: {t_stat:.2f}, P: {p_val:.5f}",
+            't_stat': t_stat,
+            'p_val': p_val
+        }
+
 
         elif selected_analysis == 'precip_test':
             conn = get_db_connection()
