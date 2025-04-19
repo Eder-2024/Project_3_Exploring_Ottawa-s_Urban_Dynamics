@@ -38,12 +38,13 @@ Through insightful visualizations built with **Python, Pandas, Seaborn, Folium, 
 
 ### 🎯 Stakeholder Focus & Questions Answered
 
-| Stakeholder               | Questions Answered | Visualizations Used |
+| Stakeholder               | Questions Answered | Visualizations Used              | Recommendations
 |--------------------------|--------------------|---------------------|
-| **🚔 Police & Traffic Enforcement** | Where are the high-collision hotspots? What time of day are collisions most frequent? | - Heatmaps (Folium) <br> - Time-of-day bar charts |
+| **🚔 Police & Traffic Enforcement** | Where are the high-collision hotspots? <br> What day of the week are collisions most frequent? Impact of environmental conditions?| - Interactive map and correlation <br> - Day-of-the-week bar charts  <br> - Daily Accident by environmental condition charts| Increase patrols at high-collision spots and traffic conrol where there are none. <br> Consider more frequent DUI checks or speed traps during risky weather conditions and especially Fridays.
 | **🏙️ Urban Planners & Local Councils** | Which intersections and areas need redesign? Is there a difference between urban and rural collisions? | - Geographic scatter plots <br> - Collision density heatmaps |
 | **🚑 Emergency Services** | Where should we prioritize emergency readiness? What conditions lead to severe accidents? | - Weather vs. severity folium marker <br> - Trend lines by road surface & lighting |
 | **📢 Educational Campaigners** | When do drivers need awareness the most? How does weather affect safe driving? | - Line plots with Viridis colors <br> - Monthly trends and rush-hour charts |
+| **🧠 Data for Research & Innovation**
 | **📦 Businesses & Logistics** | Which routes and times are safest for delivery operations? | - Interactive Accident map|
 
 ---
@@ -221,10 +222,10 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 
 ### 🙌 Contributors – Group 5: The Code Enforcers
 
-- Eder Ortiz
-- Geraldine Valencia
-- Demilade Adenuga
+- Eder Ortiz  (In charge of coding, data cleaning, and generating visualizations)
+- Geraldine Valencia (In charge of coding and interactive map visualization)
+- Demilade Adenuga  (In charge of developing visualizations and writing summaries)
 
 ---
 
-> _"We can’t prevent every accident, but we can use data to give people the best chance to avoid them."_ – The Code Ninjas 🚗💨
+> _"We can’t prevent every accident, but we can use data to give people the best chance to avoid them."_ – The Code Enforcers 🚗💨
