@@ -21,13 +21,13 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Flask route for the homepage, accepts both GET and POST requests
+# Flask route for the homepage
 @app.route('/', methods=['GET', 'POST'])
 def index():
     visualization_html = ''
     stats_output = ''
 
-    # --- Calculate Injury Totals (always) ---
+    # Calculate Injury Totals
     conn = get_db_connection()
     injury_query = '''
         SELECT severity, COUNT(*) as count
@@ -43,13 +43,12 @@ def index():
     map_df = pd.read_sql('SELECT latitude, longitude FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL', conn)
     conn.close()
 
-    # Check if the DataFrame is empty before creating the map
-    # Create a map centered around the mean Latitude and Longitude of the accident data  
+    # Create a map, check if the DataFrame is empty before creating the map
     if not map_df.empty:
         map_center = [map_df['latitude'].mean(), map_df['longitude'].mean()]
         traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='openStreetmap')
     
-    # fetch severity from the DB h
+    # fetch severity from the DB 
         conn = get_db_connection()
         s_df = pd.read_sql_query("SELECT date, latitude, longitude, severity FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL", conn)
         conn.close()
@@ -57,7 +56,7 @@ def index():
         # Generate a list of unique severity values, excluding null entries and case-insensitive 'none' 
         severities = [s for s in s_df['severity'].unique() if pd.notna(s) and s.lower() != 'none']
 
-    # # Create a Folium map centered on average accident location with a specific tile style
+    # Create a Folium map with a specific tile style
         for severity in severities:
             fg = folium.FeatureGroup(name=f"Severity: {severity}")
             cluster = MarkerCluster()
@@ -84,7 +83,7 @@ def index():
     # Add layer control to toggle severity layers
         folium.LayerControl().add_to(traffic_map)
     
-     #Render the map as HTML 
+    # Render the map as HTML 
         map_html = traffic_map._repr_html_()
     else:
         map_html = "<p>No accident data with coordinates found.</p>"

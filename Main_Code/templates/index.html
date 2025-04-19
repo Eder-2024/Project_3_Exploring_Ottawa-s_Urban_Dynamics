@@ -148,12 +148,21 @@
     <h1>🚗 Ottawa Accident Data Visualization Dashboard (2020)</h1>
     
     <div class="injury-boxes">
-        <div class="injury-box">🟢 Minimal Injuries: {{ injury_totals['Minimal'] }}</div>
-        <div class="injury-box">🟡 Minor Injuries: {{ injury_totals['Minor'] }}</div>
-        <div class="injury-box">🟠 Major Injuries: {{ injury_totals['Major'] }}</div>
-        <div class="injury-box">🔴 Fatal Injuries: {{ injury_totals['Fatal'] }}</div>
+        <div class="injury-box">
+            <span style="color: green;">⬤</span> Minimal Injuries: {{ injury_totals['Minimal'] }}
+        </div>
+        <div class="injury-box">
+            <span style="color: orange;">⬤</span> Minor Injuries: {{ injury_totals['Minor'] }}
+        </div>
+        <div class="injury-box">
+            <span style="color: red;">⬤</span> Major Injuries: {{ injury_totals['Major'] }}
+        </div>
+        <div class="injury-box">
+            <span style="color: darkred;">⬤</span> Fatal Injuries: {{ injury_totals['Fatal'] }}
+        </div>
     </div>
-
+    
+    
     <!-- Charts Row -->
     <div class="charts-row">
         <!-- Top Dates Chart -->
