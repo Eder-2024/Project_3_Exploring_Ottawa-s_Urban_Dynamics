@@ -20,7 +20,7 @@
 
 One of the things we all dread is being in a meeting and getting a call that a loved one was involved in a car accident—be it fatal or not. 
 
-Bearing that in mind, **Group 5 – The Code Ninjas** decided to analyze Ottawa's 2020 traffic collision data alongside weather data to uncover patterns, causes, and high-risk conditions. Our goal: to foretell and prevent accidents through data-driven storytelling and visual insight, ensuring everyone gets to their destination safely.
+Bearing that in mind, **Group 5 – The Code Enforcers** decided to analyze Ottawa's 2020 traffic collision data alongside weather data to uncover patterns, causes, and high-risk conditions. Our goal: to foretell and prevent accidents through data-driven storytelling and visual insight, ensuring everyone gets to their destination safely.
 
 _"We can’t prevent every accident, but we can use data to give people the best chance to avoid them."_ – The Code Enforcers 🚗💨
 
