@@ -15,11 +15,13 @@ from matplotlib import cm
 
 app = Flask(__name__)
 
+# connect to the SQlite database and create a connection object
 def get_db_connection():
     conn = sqlite3.connect('accidents.db')
     conn.row_factory = sqlite3.Row
     return conn
 
+# Flask route for the homepage, accepts both GET and POST requests
 @app.route('/', methods=['GET', 'POST'])
 def index():
     visualization_html = ''
@@ -33,40 +35,59 @@ def index():
         WHERE severity IS NOT NULL
         GROUP BY severity
     '''
+    #SQL query: count the number of accidents grouped by severity
+    #connect to the database and execute the query
     df_injuries = pd.read_sql_query(injury_query, conn)
+    
+    # Get all accident coordinates where both latitude and longitude are present
     map_df = pd.read_sql('SELECT latitude, longitude FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL', conn)
     conn.close()
 
+    # Check if the DataFrame is empty before creating the map
+    # Create a map centered around the mean Latitude and Longitude of the accident data  
     if not map_df.empty:
         map_center = [map_df['latitude'].mean(), map_df['longitude'].mean()]
-        traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='CartoDB positron')
+        traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='openStreetmap')
     
-    # fetch severity from the DB here
+    # fetch severity from the DB h
         conn = get_db_connection()
-        df = pd.read_sql_query("SELECT date, latitude, longitude, severity FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL", conn)
+        s_df = pd.read_sql_query("SELECT date, latitude, longitude, severity FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL", conn)
         conn.close()
+        
+        # Generate a list of unique severity values, excluding null entries and case-insensitive 'none' 
+        severities = [s for s in s_df['severity'].unique() if pd.notna(s) and s.lower() != 'none']
 
-        severities = df['severity'].unique()
-
+    # # Create a Folium map centered on average accident location with a specific tile style
         for severity in severities:
             fg = folium.FeatureGroup(name=f"Severity: {severity}")
             cluster = MarkerCluster()
-            for _, row in df[df['severity'] == severity].iterrows():
+            for _, row in s_df[s_df['severity'] == severity].iterrows():
                 folium.Marker(
                     location=[row['latitude'], row['longitude']],
                     popup=f"Date: {row['date']}<br>Severity: {row['severity']}",
-                    icon=folium.Icon(color="red" if severity.lower() == "severe"
-                                    else "orange" if severity.lower() == "moderate"
-                                    else "green")
+                    icon=folium.Icon(
+                        icon = ("times-circle" if severity == "04 - Fatal"
+                            else "exclamation-triangle" if severity == "03 - Major"
+                            else "exclamation-circle" if severity == "02 - Minor"
+                            else "info-circle"),# Minimal severity
+                        prefix = "fa",  
+                        color = ("darkred" if severity == "04 - Fatal"
+                            else "red" if severity == "03 - Major"
+                            else "orange" if severity == "02 - Minor"
+                            else "green"), # Minimal severity
+                        icon_color="white"
+                        )
                 ).add_to(cluster)
             fg.add_child(cluster)
             traffic_map.add_child(fg)
-
+    
+    # Add layer control to toggle severity layers
         folium.LayerControl().add_to(traffic_map)
+    
+     #Render the map as HTML 
         map_html = traffic_map._repr_html_()
     else:
         map_html = "<p>No accident data with coordinates found.</p>"
-
 
     # Initialize dictionary with all keys
     injury_totals = {
@@ -146,7 +167,7 @@ def index():
             plt.ylabel('Severity')
             plt.tight_layout()
 
-        # Finding which time of the day had the most accidents 
+        #Demilade code 
         elif selected_viz == 'hourly_accidents':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
@@ -165,8 +186,7 @@ def index():
             plt.ylabel('Accident Count')
             plt.xticks(range(0, 24))
             plt.tight_layout()
-        
-        #Finding which location spots led to the accidents
+
         elif selected_viz == 'accidents_by_location':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details;"""
@@ -203,7 +223,6 @@ def index():
             plt.xticks(rotation=15, ha='right')
             plt.tight_layout()
 
-        # Finding the traffic control situation at the location spot of the accident
         elif selected_viz == 'traffic_control':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details;"""
@@ -241,7 +260,6 @@ def index():
 
             plt.tight_layout()
 
-        #Carry out a corelation heatmap of accidents location and traffic contol against accidents to know the scenarios that have led to the accidents
         elif selected_viz == 'Heatmap_of_Accidents':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details;"""
@@ -264,7 +282,6 @@ def index():
             plt.yticks(rotation=0)
             plt.tight_layout()
 
-        # Rule of elimination - could the weather be the cause of a high number of accidents during a certain period of the year?
         elif selected_viz == 'Daily_Accidents_by_Weather':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
@@ -288,7 +305,6 @@ def index():
             plt.legend(title='Weather Type', bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.tight_layout()
 
-        # Finding out the prominent day that accidents highly occur.
         elif selected_viz == 'Number_of_Accidents_by_Day':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
