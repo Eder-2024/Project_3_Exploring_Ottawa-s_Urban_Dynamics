@@ -80,11 +80,6 @@ cd Project_3_Exploring_Ottawa-s_Urban_Dynamics
 ```bash
 pip install flask pandas matplotlib seaborn folium statsmodels scipy
 
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
 ```
 🧠 Project Structure
 Project_3_Exploring_Ottawa-s_Urban_Dynamics/
