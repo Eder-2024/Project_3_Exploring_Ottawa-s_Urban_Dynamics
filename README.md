@@ -14,7 +14,6 @@
   <img src="https://img.shields.io/badge/HeatMap-%234CAF50.svg?style=for-the-badge&logo=folium&logoColor=white" />
   <img src="https://img.shields.io/badge/MarkerCluster-%234CAF50.svg?style=for-the-badge&logo=folium&logoColor=white" />
 </p>
----
 
 ### 💡 Introduction
 
@@ -38,14 +37,14 @@ Through insightful visualizations built with **Python, Pandas, Seaborn, Folium, 
 
 ### 🎯 Stakeholder Focus & Questions Answered
 
-| Stakeholder               | Questions Answered | Visualizations Used              | Recommendations
-|--------------------------|--------------------|---------------------|
-| **🚔 Police & Traffic Enforcement** | Where are the high-collision hotspots? <br> What day of the week are collisions most frequent? Impact of environmental conditions?| - Interactive map and correlation <br> - Day-of-the-week bar charts  <br> - Daily Accident by environmental condition charts| Increase patrols at high-collision spots and traffic conrol where there are none. <br> Consider more frequent DUI checks or speed traps during risky weather conditions and especially Fridays.
-| **🏙️ Urban Planners & Local Councils** | Which intersections and areas need redesign? Is there a difference between urban and rural collisions? | - Geographic scatter plots <br> - Collision density heatmaps |
-| **🚑 Emergency Services** | Where should we prioritize emergency readiness? What conditions lead to severe accidents? | - Weather vs. severity folium marker <br> - Trend lines by road surface & lighting |
-| **📢 Educational Campaigners** | When do drivers need awareness the most? How does weather affect safe driving? | - Line plots with Viridis colors <br> - Monthly trends and rush-hour charts |
-| **🧠 Data for Research & Innovation**
-| **📦 Businesses & Logistics** | Which routes and times are safest for delivery operations? | - Interactive Accident map|
+| Stakeholder                         | Key Questions Answered                                                                                          | Visualizations Used                                                                 | Recommendations                                                                                                                                         |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **🚔 Police & Traffic Enforcement** | - Where are the high-collision hotspots?<br>- What day of the week are collisions most frequent?<br>- Impact of environmental conditions? | - Interactive collision map<br>- Day-of-week bar charts<br>- Daily accidents by environmental condition charts | - Increase patrols and traffic control at hotspots.<br>- Schedule DUI checks and speed traps during risky weather and on Fridays.                      |
+| **🏙️ Urban Planners & Local Councils** | - Which intersections and areas need redesign?<br>- Where do weather and infrastructure issues intersect?        | - Interactive map<br>- Heat maps                                                  | - Improve drainage and road treatments in snowy zones.<br>- Install smart traffic signals responsive to weather conditions.                            |
+| **🚑 Emergency Services**          | - Where should emergency readiness be prioritized?<br>- What conditions lead to severe accidents?                | - Weather vs. accident severity charts                                             | - Allocate emergency resources near high-severity zones.<br>- Improve response readiness during hazardous weather.                                      |
+| **📢 Educational Campaigners**     | - When do drivers need awareness the most?<br>- How does weather affect safe driving behavior?                   | - Viridis-colored line plots<br>- Monthly trend charts<br>- Rush-hour analysis     | - Launch awareness campaigns in peak months and during rush hours.<br>- Tailor messages to weather-related risks.                                       |
+| **🧠 Data for Research & Innovation** | - What patterns emerge across seasons and years?<br>- How can data support predictive modeling and policy change? | - All visualizations, especially time-series and severity correlations              | - Use findings to build AI-driven safety alerts.<br>- Support data-driven policies and innovations in transport safety.                                |
+| **📦 Businesses & Logistics**      | - Which routes and times are safest for delivery operations?                                                     | - Interactive accident maps                                                        | - Optimize delivery schedules around safe routes and times.<br>- Implement driver safety protocols during high-risk periods.                            |
 
 ---
 
@@ -132,29 +131,13 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
 
 ## Summary of Statistical Analysis 
 
-### Objectives: xxx
-
 ## Snow & Precipitation Impact (T-Tests)
 
 Snow and precipitation significantly affect the number of vehicles involved in accidents:
 
-- Extremely low p-values (< 0.00001) indicate strong statistical evidence that both snow and rain contribute to higher accident volumes.
-  - **Snow →** More accidents (positive t-statistic)
-  - **Precipitation →** Fewer accidents (negative t-statistic — likely due to more cautious driving in rain)
-
----
-
 ## Weather & Fatalities (Linear Regression)
 
 All weather variables (tavg, wspd, prcp, snow) show statistically significant effects on the number of fatalities. 
-
-However, the model has issues:
-- **Negative R-squared (-inf):** Likely due to constant values (fatalities always = 1), or small sample variation.
-- **Multicollinearity warning:** Weather variables may be too correlated with each other.
-
-Still, significance (p < 0.05) implies a predictable, though weak, relationship.
-
----
 
 ## ☃️ Fatalities by Weather Category
 
