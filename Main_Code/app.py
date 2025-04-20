@@ -12,7 +12,7 @@ from folium.plugins import HeatMap
 from folium.plugins import MarkerCluster
 from matplotlib import cm
 
-
+# Initialize Flask application
 app = Flask(__name__)
 
 # connect to the SQlite database and create a connection object
@@ -21,9 +21,10 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Flask route for the homepage
+# Flask route for the homepage - Main Route (/)
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # Initialize variables for charts and stats output
     visualization_html = ''
     stats_output = ''
 
@@ -35,28 +36,27 @@ def index():
         WHERE severity IS NOT NULL
         GROUP BY severity
     '''
-    #SQL query: count the number of accidents grouped by severity
-    #connect to the database and execute the query
+ # Query to count accidents grouped by severity
     df_injuries = pd.read_sql_query(injury_query, conn)
     
-    # Get all accident coordinates where both latitude and longitude are present
+    # Get all valid coordinates for mapping
     map_df = pd.read_sql('SELECT latitude, longitude FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL', conn)
     conn.close()
 
-    # Create a map, check if the DataFrame is empty before creating the map
+    #  If accident data has coordinates, build the Folium map
     if not map_df.empty:
         map_center = [map_df['latitude'].mean(), map_df['longitude'].mean()]
         traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='openStreetmap')
     
-    # fetch severity from the DB 
+    # fetching severity from the DB 
         conn = get_db_connection()
         s_df = pd.read_sql_query("SELECT date, latitude, longitude, severity FROM accidents_data WHERE latitude IS NOT NULL AND longitude IS NOT NULL", conn)
         conn.close()
         
-        # Generate a list of unique severity values, excluding null entries and case-insensitive 'none' 
+        # Filter out 'None' or invalid severities
         severities = [s for s in s_df['severity'].unique() if pd.notna(s) and s.lower() != 'none']
 
-    # Create a Folium map with a specific tile style
+    # Loop through severity levels and create marker layers
         for severity in severities:
             fg = folium.FeatureGroup(name=f"Severity: {severity}")
             cluster = MarkerCluster()
@@ -80,7 +80,7 @@ def index():
             fg.add_child(cluster)
             traffic_map.add_child(fg)
     
-    # Add layer control to toggle severity layers
+    # Add layer control to the toggle severity layers
         folium.LayerControl().add_to(traffic_map)
     
     # Render the map as HTML 
@@ -88,14 +88,14 @@ def index():
     else:
         map_html = "<p>No accident data with coordinates found.</p>"
 
-    # Initialize dictionary with all keys
+    # Initialize dictionary with all keys in 0
     injury_totals = {
         'Minimal': 0,
         'Minor': 0,
         'Major': 0,
         'Fatal': 0
     }
-
+    # Classify injuries based on severity codes
     for _, row in df_injuries.iterrows():
         sev = row['severity'].strip() if row['severity'] else 'Unknown'
         if sev.startswith('01'):
@@ -109,7 +109,7 @@ def index():
         else:
             continue
 
-    # --- Handle Form POST ---
+    # Handle Visualization Requests
     if request.method == 'POST':
         selected_viz = request.form.get('viz')
         selected_analysis = request.form.get('analysis')
@@ -118,40 +118,28 @@ def index():
             conn = get_db_connection() 
             df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn) 
             conn.close() 
+            # Plot histogram
             plt.figure(figsize=(10, 6)) 
             sns.histplot(df['no__of_vehicles'], bins=10, kde=True) 
             plt.title("Number of Vehicles Involved in Accidents")
 
         elif selected_viz == 'light_conditions':
+            # Pie chart of accidents under different light conditions
             conn = get_db_connection()
             query = '''SELECT light, COUNT(*) as accident_count FROM accident_details
                     GROUP BY light ORDER BY accident_count DESC;'''
             df = pd.read_sql_query(query, conn)
             conn.close()
-            plt.figure(figsize=(8, 8))
-
-            # Generate colors using the 'viridis' colormap
-            
+            # Plot bar chart
+            plt.figure(figsize=(8, 8))  
             cmap = cm.get_cmap('viridis')
             colors = [cmap(i / len(df)) for i in range(len(df))]
-
             plt.pie(df['accident_count'], labels=df['light'], autopct='%1.1f%%', startangle=140, colors=colors)
             plt.title('Number of Accidents by Light Conditions')
             plt.tight_layout()
 
-        elif selected_viz == 'environment_conditions':
-            conn = get_db_connection()
-            query = '''SELECT environment_condition, COUNT(*) as accident_count
-                       FROM accident_details GROUP BY environment_condition ORDER BY accident_count DESC;'''
-            df = pd.read_sql_query(query, conn)
-            conn.close()
-            plt.figure(figsize=(10, 6))
-            plt.bar(df['environment_condition'], df['accident_count'], color='lightblue')
-            plt.title('Accidents by Environmental Conditions')
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-
         elif selected_viz == 'severity_weather':
+            # scatter chart of Severity vs Average Temperature
             conn = get_db_connection()
             query = '''SELECT severity, tavg, prcp FROM accidents_data
                        JOIN weather_data ON accidents_data.date = weather_data.date;'''
@@ -166,17 +154,15 @@ def index():
             plt.ylabel('Severity')
             plt.tight_layout()
 
-        #Demilade code 
+        
         elif selected_viz == 'hourly_accidents':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
             df = pd.read_sql_query(query, conn)
             conn.close()
-
             # Convert 'accident_time' to datetime and extract the hour of the day
             df['accident_time'] = pd.to_datetime(df['accident_time'], format='%I:%M %p', errors='coerce')
             df['hour_of_day'] = df['accident_time'].dt.hour
-
             # Plot number of accidents by hour
             plt.figure(figsize=(10, 6))
             sns.countplot(x='hour_of_day', data=df, hue='hour_of_day', palette='viridis', legend=False)
@@ -191,7 +177,6 @@ def index():
             query = """SELECT * FROM accident_details;"""
             df = pd.read_sql_query(query, conn)
             conn.close()
-
             total = len(df)
             plt.figure(figsize=(10, 6))
             ax = sns.countplot(x='accident_location', data=df, palette='viridis')
@@ -206,7 +191,6 @@ def index():
                 ax.annotate(f'{percent:.1f}%', 
                             (p.get_x() + p.get_width() / 2., count),
                             ha='center', va='bottom', fontsize=10, color='black', xytext=(0, 3), textcoords='offset points')
-
             # Set y-ticks as percentage
             yticks = ax.get_yticks()
             ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
@@ -215,10 +199,7 @@ def index():
                 unique_locations = df['accident_location'].unique()
                 handles = [plt.Rectangle((0,0),1,1, color=color) for color in sns.color_palette('viridis', len(unique_locations))]
                 labels = unique_locations
-
             plt.legend(handles, labels, title='Accident Location', bbox_to_anchor=(1.05, 1), loc='upper left')
-
-
             plt.xticks(rotation=15, ha='right')
             plt.tight_layout()
 
@@ -227,14 +208,12 @@ def index():
             query = """SELECT * FROM accident_details;"""
             df = pd.read_sql_query(query, conn)
             conn.close()
-
             total = len(df)
             plt.figure(figsize=(10, 6))
             ax = sns.countplot(x='traffic_control', data=df, palette='viridis')
             plt.title('Percentage of Accidents by Traffic Control')
             plt.xlabel('Traffic Control')
             plt.ylabel('Percentage of Total Accidents (%)')
-
             # Add percentage labels
             for p in ax.patches:
                 count = p.get_height()
@@ -242,21 +221,16 @@ def index():
                 ax.annotate(f'{percent:.1f}%',
                             (p.get_x() + p.get_width() / 2., count),
                             ha='center', va='bottom', fontsize=10, color='black', xytext=(0, 3), textcoords='offset points')
-
             # Set y-ticks as percentage
             yticks = ax.get_yticks()
             ax.set_yticklabels([f'{(y / total) * 100:.0f}%' for y in yticks])
-
             # Clean and consistent x-axis labels
             ax.set_xticklabels(ax.get_xticklabels(), rotation=20, ha='right')
-
             # Create a legend with color patches matching each category
             unique_traffic = df['traffic_control'].unique()
             colors = sns.color_palette('viridis', len(unique_traffic))
             handles = [plt.Rectangle((0, 0), 1, 1, color=color) for color in colors]
             plt.legend(handles, unique_traffic, title='Traffic Control', bbox_to_anchor=(1.05, 1), loc='upper left')
-
-
             plt.tight_layout()
 
         elif selected_viz == 'Heatmap_of_Accidents':
@@ -281,12 +255,11 @@ def index():
             plt.yticks(rotation=0)
             plt.tight_layout()
 
-        elif selected_viz == 'Daily_Accidents_by_Weather':
+        elif selected_viz == 'Daily_Accidents_by_environment_conditions':
             conn = get_db_connection()
             query = """SELECT * FROM accident_details"""
             df = pd.read_sql_query(query, conn)
             conn.close()
-
             # Force conversion of collision_time to datetime format
             df['accident_date'] = pd.to_datetime(df['accident_date'], errors='coerce')
             # Drop rows where datetime conversion failed (optional but helps)
@@ -297,7 +270,7 @@ def index():
             # Plot the trend over time
             plt.figure(figsize=(12, 6))
             daily_weather_collisions.plot(kind='line', figsize=(12, 6), marker='o')
-            plt.title('Daily Accidents by Weather Condition in 2020')
+            plt.title('Daily Accidents by environment conditions in 2020')
             plt.xlabel('Date')
             plt.ylabel('Number of Accidents')
             plt.xticks(rotation=45)
@@ -309,7 +282,6 @@ def index():
             query = """SELECT * FROM accident_details"""
             df = pd.read_sql_query(query, conn)
             conn.close()
-
             # Ensure 'accident_date' is in datetime format
             df['accident_date'] = pd.to_datetime(df['accident_date'], errors='coerce')
             # Drop rows where date parsing failed
@@ -331,7 +303,7 @@ def index():
             plt.tight_layout()
 
         
-
+        # Encode the plot to HTML unless it's a folium heatmap
         if selected_viz and selected_viz != 'heatmap':
             img = io.BytesIO()
             plt.savefig(img, format='png')
@@ -339,7 +311,7 @@ def index():
             plot_url = base64.b64encode(img.getvalue()).decode()
             plt.close()
             visualization_html = f'<img src="data:image/png;base64,{plot_url}"/>'
-
+        # Special case: Folium Heatmap
         elif selected_viz == 'heatmap':
             conn = get_db_connection()
             df = pd.read_sql('SELECT latitude, longitude FROM accidents_data', conn)
@@ -350,8 +322,9 @@ def index():
         
         
 
-        # ---- STATISTICAL SECTION ----
+        # ---- Statistical Analysis Section  ----
         if selected_analysis == 'snow_test':
+            # T-test comparing snow vs no-snow vehicle counts
             conn = get_db_connection()
             snow = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
                               JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow > 0''', conn)
@@ -359,7 +332,6 @@ def index():
                                  JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.snow = 0''', conn)
             conn.close()
             t_stat, p_val = stats.ttest_ind(snow['no__of_vehicles'], no_snow['no__of_vehicles'])
-
             stats_output = {
             'message': f"Snow vs No Snow → T: {t_stat:.2f}, P: {p_val:.5f}",
             't_stat': t_stat,
@@ -368,6 +340,7 @@ def index():
 
 
         elif selected_analysis == 'precip_test':
+            # T-test comparing wet vs dry days
             conn = get_db_connection()
             wet = pd.read_sql('''SELECT ad.no__of_vehicles FROM accident_details ad
                                  JOIN weather_data wd ON ad.accident_date = wd.date WHERE wd.prcp > 0''', conn)
@@ -378,6 +351,7 @@ def index():
             stats_output = f"Precipitation vs No Precipitation → T: {t_stat:.2f}, P: {p_val:.5f}"
 
         elif selected_analysis == 'correlation_analysis':
+            # Heatmap of correlations between weather and fatal accidents
             conn = get_db_connection()
             df = pd.read_sql('''SELECT wd.tavg, wd.wspd, wd.snow, wd.prcp, ad.no__of_fatal
                                 FROM accident_details ad JOIN weather_data wd ON ad.accident_date = wd.date''', conn)
@@ -394,6 +368,7 @@ def index():
             visualization_html = f'<img src="data:image/png;base64,{plot_url}"/>'
 
         elif selected_analysis == 'regression_analysis':
+            # Multiple linear regression: fatalities ~ weather features
             conn = get_db_connection()
             df = pd.read_sql('''SELECT wd.tavg, wd.wspd, wd.snow, wd.prcp, ad.no__of_fatal
                                 FROM accident_details ad JOIN weather_data wd ON ad.accident_date = wd.date
@@ -404,7 +379,7 @@ def index():
             y = df['no__of_fatal']
             model = sm.OLS(y, X).fit()
             stats_output = model.summary().as_text()
-
+# Render the final dashboard
     return render_template(
         'index.html',
         visualization=visualization_html,
@@ -412,8 +387,10 @@ def index():
         injury_totals=injury_totals,
         map_html=map_html  
     )
+# ------------------------- API Endpoints -------------------------
 @app.route('/api/linechart')
 def api_line_chart():
+    # Return accident count per date, optionally filtered by severity
     severity = request.args.get('severity', 'all')
     conn = get_db_connection()
     if severity == 'all':
@@ -427,6 +404,7 @@ def api_line_chart():
 
 @app.route('/heatmap')
 def heatmap():
+    # Standalone heatmap view
     conn = get_db_connection()
     df = pd.read_sql('SELECT latitude, longitude FROM accidents_data', conn)
     conn.close()
@@ -436,7 +414,7 @@ def heatmap():
 
 @app.route('/map', methods=['GET'])
 def map_view():
-    # Generate the map
+    # Basic cluster map with severity layers
     conn = get_db_connection()
     query = """
     SELECT date, latitude, longitude, severity
@@ -445,7 +423,7 @@ def map_view():
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
-
+# Group markers by severity
     map_center = [df['latitude'].mean(), df['longitude'].mean()]
     traffic_map = folium.Map(location=map_center, zoom_start=12, tiles='CartoDB positron')
     severities = df['severity'].unique()
@@ -474,6 +452,7 @@ def map_view():
 
 @app.route('/api/top_dates')
 def api_top_dates():
+     # Return top 10 days with highest accident counts
     conn = get_db_connection()
     query = '''
         SELECT accident_date, COUNT(*) as accident_count 
@@ -496,6 +475,6 @@ def api_top_dates():
 
     return jsonify(result)
 
-
+# Run app in debug mode
 if __name__ == '__main__':
     app.run(debug=True)
