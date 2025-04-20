@@ -70,18 +70,22 @@ Merged on date to correlate weather with accidents.
 
 ## 🛠️ Installation & Setup
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics.git
 cd Project_3_Exploring_Ottawa-s_Urban_Dynamics
 ```
+---
 
 ### 2. Install Required Python Libraries
+
+Make sure you have **Python 3.8+** and **pip** installed. Then run:
+
 ```bash
 pip install flask pandas matplotlib seaborn folium statsmodels scipy
-
 ```
-🧠 Project Structure
+---
+## 🧠 Project Structure
+```
 Project_3_Exploring_Ottawa-s_Urban_Dynamics/
 │
 ├── app.py                 # Flask app - main backend logic
@@ -93,37 +97,38 @@ Project_3_Exploring_Ottawa-s_Urban_Dynamics/
 │
 ├── static/
 │   └── style.css          # Custom CSS styles
-
-🚀 How to Run the App
-
-✅ Option 1: Using Visual Studio Code (VS Code)
-Open VS Code.
-
-1.Open the project folder:
-2.Project_3_Exploring_Ottawa-s_Urban_Dynamics/
-3.Open app.py
-4.Run the app:
-
-    *open the terminal and run:
-
-    ```bash
-      python app.py
-
-5.Go to your browser and visit:
-👉 http://127.0.0.1:5000
-
-🖥️ Option 2: Using Windows Command Prompt (CMD)
-1.Open Command Prompt.
-2.Navigate to the project folder:
- ```bash
-  cd path\to\Project_3_Exploring_Ottawa-s_Urban_Dynamics
-3.Run the Flask app:
-```bash
-python app.py
-4.Open your browser and go to:
-👉 http://127.0.0.1:5000
-
-
+```
+---
+## 🚀 How to Run the App
+You can run this app either via **Visual Studio Code** or the **Windows Command Prompt**:
+---
+### ✅ Option 1: Using Visual Studio Code (VS Code)
+1. Open **VS Code**.
+2. Open the project folder:  
+   `Project_3_Exploring_Ottawa-s_Urban_Dynamics/`
+3. Open `app.py`.
+4. Run the app:
+   - Either press `F5`
+   - Or open the terminal and run:
+     ```bash
+     python app.py
+     ```
+5. Go to your browser and visit:  
+   👉 `http://127.0.0.1:5000`
+---
+### 🖥️ Option 2: Using Windows Command Prompt (CMD)
+1. Open **Command Prompt**.
+2. Navigate to the project folder:
+   ```bash
+   cd path\to\Project_3_Exploring_Ottawa-s_Urban_Dynamics
+   ```
+3. Run the Flask app:
+   ```bash
+   python app.py
+   ```
+4. Open your browser and go to:  
+   👉 `http://127.0.0.1:5000`
+   
 ## 📉 Summary Findings 📈
 
 ## Summary of Statistical Analysis 
