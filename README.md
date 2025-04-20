@@ -73,52 +73,61 @@ Merged on date to correlate weather with accidents.
 
 ```bash
 git clone https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics.git
-cd traffic-map-viewer
+cd Project_3_Exploring_Ottawa-s_Urban_Dynamics
 ```
 
-### 2. Set Up a Virtual Environment (Optional but Recommended)
-
+### 2. Install Required Python Libraries
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+pip install flask pandas matplotlib seaborn folium statsmodels scipy
+
 
 ### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+🧠 Project Structure
+Project_3_Exploring_Ottawa-s_Urban_Dynamics/
+│
+├── app.py                 # Flask app - main backend logic
+├── mainCode.ipynb         # Jupyter notebook for EDA and testing
+├── accidents.db           # SQLite database with accident + weather data
+│
+├── templates/
+│   └── index.html         # HTML template for the dashboard
+│
+├── static/
+│   └── style.css          # Custom CSS styles
 
-### 4. Ensure Database Exists
+🚀 How to Run the App
 
-You must have an SQLite database named `accidents.db` with a table called `accidents_data` that includes:
-- `date`
-- `latitude`
-- `longitude`
-- `severity`
+✅ Option 1: Using Visual Studio Code (VS Code)
+Open VS Code.
 
-Sample SQL to create the table:
+1.Open the project folder:
+2.Project_3_Exploring_Ottawa-s_Urban_Dynamics/
+3.Open app.py
+4.Run the app:
 
-```sql
-CREATE TABLE accidents_data (
-    id INTEGER PRIMARY KEY,
-    date TEXT,
-    latitude REAL,
-    longitude REAL,
-    severity TEXT
-);
-```
+    *open the terminal and run:
 
-Populate it with your data accordingly.
+    ```bash
+      python app.py
 
-### 5. Run the App
+5.Go to your browser and visit:
+👉 http://127.0.0.1:5000
 
+🖥️ Option 2: Using Windows Command Prompt (CMD)
+1.Open Command Prompt.
+2.Navigate to the project folder:
+ ```bash
+  cd path\to\Project_3_Exploring_Ottawa-s_Urban_Dynamics
+3.Run the Flask app:
 ```bash
 python app.py
-```
+4.Open your browser and go to:
+👉 http://127.0.0.1:5000
 
-### Then go to `http://127.0.0.1:5000` in your browser.
----
 
 ## 📉 Summary Findings 📈
 
