@@ -108,8 +108,7 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
    `Project_3_Exploring_Ottawa-s_Urban_Dynamics/`
 3. Open `app.py`.
 4. Run the app:
-   - Either press `F5`
-   - Or open the terminal and run:
+   - Open the terminal and run:
      ```bash
      python app.py
      ```
