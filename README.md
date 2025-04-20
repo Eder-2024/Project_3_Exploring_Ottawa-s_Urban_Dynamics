@@ -70,56 +70,64 @@ Merged on date to correlate weather with accidents.
 
 ## 🛠️ Installation & Setup
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics.git
-cd traffic-map-viewer
+cd Project_3_Exploring_Ottawa-s_Urban_Dynamics
 ```
-
-### 2. Set Up a Virtual Environment (Optional but Recommended)
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Ensure Database Exists
-
-You must have an SQLite database named `accidents.db` with a table called `accidents_data` that includes:
-- `date`
-- `latitude`
-- `longitude`
-- `severity`
-
-Sample SQL to create the table:
-
-```sql
-CREATE TABLE accidents_data (
-    id INTEGER PRIMARY KEY,
-    date TEXT,
-    latitude REAL,
-    longitude REAL,
-    severity TEXT
-);
-```
-
-Populate it with your data accordingly.
-
-### 5. Run the App
-
-```bash
-python app.py
-```
-
-### Then go to `http://127.0.0.1:5000` in your browser.
 ---
 
+### 2. Install Required Python Libraries
+
+Make sure you have **Python 3.8+** and **pip** installed. Then run:
+
+```bash
+pip install flask pandas matplotlib seaborn folium statsmodels scipy
+```
+---
+## 🧠 Project Structure
+```
+Project_3_Exploring_Ottawa-s_Urban_Dynamics/
+│
+├── app.py                 # Flask app - main backend logic
+├── mainCode.ipynb         # Jupyter notebook for EDA and testing
+├── accidents.db           # SQLite database with accident + weather data
+│
+├── templates/
+│   └── index.html         # HTML template for the dashboard
+│
+├── static/
+│   └── style.css          # Custom CSS styles
+```
+---
+## 🚀 How to Run the App
+You can run this app either via **Visual Studio Code** or the **Windows Command Prompt**:
+---
+### ✅ Option 1: Using Visual Studio Code (VS Code)
+1. Open **VS Code**.
+2. Open the project folder:  
+   `Project_3_Exploring_Ottawa-s_Urban_Dynamics/`
+3. Open `app.py`.
+4. Run the app:
+   - Open the terminal and run:
+     ```bash
+     python app.py
+     ```
+5. Go to your browser and visit:  
+   👉 `http://127.0.0.1:5000`
+---
+### 🖥️ Option 2: Using Windows Command Prompt (CMD)
+1. Open **Command Prompt**.
+2. Navigate to the project folder:
+   ```bash
+   cd path\to\Project_3_Exploring_Ottawa-s_Urban_Dynamics
+   ```
+3. Run the Flask app:
+   ```bash
+   python app.py
+   ```
+4. Open your browser and go to:  
+   👉 `http://127.0.0.1:5000`
+   
 ## 📉 Summary Findings 📈
 
 ## Summary of Statistical Analysis 
@@ -225,6 +233,27 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 - Eder Ortiz  (In charge of coding, data cleaning, and generating visualizations)
 - Geraldine Valencia (In charge of coding and interactive map visualization)
 - Demilade Adenuga  (In charge of developing visualizations and writing summaries)
+
+---
+## 📚 License & Data Sources
+This project uses open data provided by two official sources:
+
+---
+### 🚦 **Traffic Accident Data**  
+**Source**: [City of Ottawa Open Data Portal](https://open.ottawa.ca/datasets/bf701649829642d28fa2e400a7136bdd_0/explore?location=45.249450%2C-75.797667%2C0.84)  
+**License**: [Open Government License – City of Ottawa](https://open.ottawa.ca/pages/licence/)  
+> The City of Ottawa provides free access to many of its datasets through a dedicated data portal.  
+> The data is licensed under the **Open Government License**, making it easy to use and reuse.  
+> For more information, visit [Open Ottawa](https://open.ottawa.ca).
+---
+### 🌤 **Weather Data**  
+**Source**: [Meteostat – Ottawa Historical Weather](https://meteostat.net/en/place/ca/ottawa?s=71063&t=2020-01-01/2020-12-31)  
+**License**:  
+> Copyright © Meteostat  
+> Weather data provided by **NOAA**, **Deutscher Wetterdienst**, and **Environment Canada**.  
+> For full details, see [Meteostat Legal & Privacy](https://meteostat.net/en/about/legal).
+---
+This project itself is released under the **MIT License** for educational and research purposes.
 
 ---
 
