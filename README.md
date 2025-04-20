@@ -236,32 +236,23 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 
 ---
 ## 📚 License & Data Sources
-
 This project uses open data provided by two official sources:
-
 ---
-
 ### 🚦 **Traffic Accident Data**  
 **Source**: [City of Ottawa Open Data Portal](https://open.ottawa.ca/datasets/bf701649829642d28fa2e400a7136bdd_0/explore?location=45.249450%2C-75.797667%2C0.84)  
 **License**: [Open Government License – City of Ottawa](https://open.ottawa.ca/pages/licence/)  
-
 > The City of Ottawa provides free access to many of its datasets through a dedicated data portal.  
 > The data is licensed under the **Open Government License**, making it easy to use and reuse.  
 > For more information, visit [Open Ottawa](https://open.ottawa.ca).
-
 ---
-
 ### 🌤 **Weather Data**  
 **Source**: [Meteostat – Ottawa Historical Weather](https://meteostat.net/en/place/ca/ottawa?s=71063&t=2020-01-01/2020-12-31)  
 **License**:  
 > Copyright © Meteostat  
 > Weather data provided by **NOAA**, **Deutscher Wetterdienst**, and **Environment Canada**.  
 > For full details, see [Meteostat Legal & Privacy](https://meteostat.net/en/about/legal).
-
 ---
-
 This project itself is released under the **MIT License** for educational and research purposes.
-
 ---
 
 > _"We can’t prevent every accident, but we can use data to give people the best chance to avoid them."_ – The Code Enforcers 🚗💨
