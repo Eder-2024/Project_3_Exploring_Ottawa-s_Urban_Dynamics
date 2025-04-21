@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify
 import sqlite3
 import pandas as pd
 from scipy import stats
-import statsmodels.api as sm
 import seaborn as sns
 import matplotlib.pyplot as plt
 import io
@@ -27,6 +26,7 @@ def index():
     # Initialize variables for charts and stats output
     visualization_html = ''
     stats_output = ''
+###----------------------------------------------------Folium Map query layers----------------
 
     # Calculate Injury Totals
     conn = get_db_connection()
@@ -88,6 +88,7 @@ def index():
     else:
         map_html = "<p>No accident data with coordinates found.</p>"
 
+##------------------------------------------------injury-boxes-------------------------------------------------------------------------
     # Initialize dictionary with all keys in 0
     injury_totals = {
         'Minimal': 0,
@@ -108,22 +109,13 @@ def index():
             injury_totals['Fatal'] += row['count']
         else:
             continue
-
+##-----------------------------------------------Explore More Visualizations & Statistical Analyses--------------------------------------------------------
     # Handle Visualization Requests
     if request.method == 'POST':
         selected_viz = request.form.get('viz')
         selected_analysis = request.form.get('analysis')
 
-        if selected_viz == 'histogram': 
-            conn = get_db_connection() 
-            df = pd.read_sql('SELECT no__of_vehicles FROM accident_details', conn) 
-            conn.close() 
-            # Plot histogram
-            plt.figure(figsize=(10, 6)) 
-            sns.histplot(df['no__of_vehicles'], bins=10, kde=True) 
-            plt.title("Number of Vehicles Involved in Accidents")
-
-        elif selected_viz == 'light_conditions':
+        if selected_viz == 'light_conditions':
             # Pie chart of accidents under different light conditions
             conn = get_db_connection()
             query = '''SELECT light, COUNT(*) as accident_count FROM accident_details
@@ -303,7 +295,7 @@ def index():
             plt.tight_layout()
 
         
-        # Encode the plot to HTML unless it's a folium heatmap
+        # Encode the plot to HTML unless it's a heatmap
         if selected_viz and selected_viz != 'heatmap':
             img = io.BytesIO()
             plt.savefig(img, format='png')
@@ -311,18 +303,8 @@ def index():
             plot_url = base64.b64encode(img.getvalue()).decode()
             plt.close()
             visualization_html = f'<img src="data:image/png;base64,{plot_url}"/>'
-        # Special case: Folium Heatmap
-        elif selected_viz == 'heatmap':
-            conn = get_db_connection()
-            df = pd.read_sql('SELECT latitude, longitude FROM accidents_data', conn)
-            conn.close()
-            m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=12)
-            HeatMap(df[['latitude', 'longitude']].values.tolist()).add_to(m)
-            visualization_html = m.get_root().render()
-        
-        
 
-        # ---- Statistical Analysis Section  ----
+## ------------------------------------ Statistical Analysis Section  -----------------------------------------------------------------------
         if selected_analysis == 'snow_test':
             # T-test comparing snow vs no-snow vehicle counts
             conn = get_db_connection()
@@ -350,35 +332,6 @@ def index():
             t_stat, p_val = stats.ttest_ind(wet['no__of_vehicles'], dry['no__of_vehicles'])
             stats_output = f"Precipitation vs No Precipitation → T: {t_stat:.2f}, P: {p_val:.5f}"
 
-        elif selected_analysis == 'correlation_analysis':
-            # Heatmap of correlations between weather and fatal accidents
-            conn = get_db_connection()
-            df = pd.read_sql('''SELECT wd.tavg, wd.wspd, wd.snow, wd.prcp, ad.no__of_fatal
-                                FROM accident_details ad JOIN weather_data wd ON ad.accident_date = wd.date''', conn)
-            conn.close()
-            corr = df.corr(numeric_only=True)
-            plt.figure(figsize=(8, 6))
-            sns.heatmap(corr, annot=True, cmap='coolwarm')
-            plt.title('Correlation: Weather vs Fatalities')
-            img = io.BytesIO()
-            plt.savefig(img, format='png')
-            img.seek(0)
-            plot_url = base64.b64encode(img.getvalue()).decode()
-            plt.close()
-            visualization_html = f'<img src="data:image/png;base64,{plot_url}"/>'
-
-        elif selected_analysis == 'regression_analysis':
-            # Multiple linear regression: fatalities ~ weather features
-            conn = get_db_connection()
-            df = pd.read_sql('''SELECT wd.tavg, wd.wspd, wd.snow, wd.prcp, ad.no__of_fatal
-                                FROM accident_details ad JOIN weather_data wd ON ad.accident_date = wd.date
-                                WHERE wd.tavg IS NOT NULL''', conn)
-            conn.close()
-            df.dropna(inplace=True)
-            X = sm.add_constant(df[['tavg', 'wspd', 'snow', 'prcp']])
-            y = df['no__of_fatal']
-            model = sm.OLS(y, X).fit()
-            stats_output = model.summary().as_text()
 # Render the final dashboard
     return render_template(
         'index.html',
@@ -387,7 +340,7 @@ def index():
         injury_totals=injury_totals,
         map_html=map_html  
     )
-# ------------------------- API Endpoints -------------------------
+# ------------------------------------ API Endpoints ----------------------------------------------------------------------
 @app.route('/api/linechart')
 def api_line_chart():
     # Return accident count per date, optionally filtered by severity
