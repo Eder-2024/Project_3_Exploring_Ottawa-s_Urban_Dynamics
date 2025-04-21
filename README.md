@@ -186,27 +186,34 @@ This map is accessible through a separate tab linked from the main visualization
 
 ---
 
-- Scatter plot - Severity vs. Weather - This shoes the impact of the weather on the severity of accidents in terms of fatal, major, minor and minimal.
+- **Scatter plot - Severity vs. Weather**
+  - This shows the impact of the weather on the severity of accidents in terms of fatal, major, minor and minimal.
 
 ![Scatter Plot - Severity vs Weather](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Scatter%20Plot%20-%20Severity%20vs%20Weather.png)
 
-- Daily Accidents by Environmental conditions - This shows that in the winter months - snow led to high number of accidents on certain dates between Nvember and MaRCH with great fatalities.
+- **Daily Accidents by Environmental Conditions**  
+  - This chart highlights how snowy conditions during the winter months—particularly between November and March—led to a spike in accident counts on specific days, including several with high fatality rates.
 
 ![Daily Accidents by Environmental Conditions in 2020](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Daily%20Accidents%20by%20Environmental%20Conditions%20in%202020.png)
 
-- Top Dates chart - This shows the dates with the highest number of accidents are seen between November and March.
+- **Top Dates Chart**  
+  - Highlights the specific dates with the highest number of accidents, most of which occurred between November and March.
 
 ![top-dates-chart](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/top-dates-chart.png)
 
-- Number of Accidents by Day of the week - This shows that most accidents happened on Friday and this couls be as a result that its the last day f the week with many celebrating TGIF, parties and some may be driving under influence.
+- **Number of Accidents by Day of the Week**  
+  - Reveals that most accidents occurred on Fridays, possibly due to increased end-of-week activities such as parties, celebrations, and a higher likelihood of driving under the influence.
 
 ![Number of Accidents by Day of the Week in 2020](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Number%20of%20Accidents%20by%20Day%20of%20the%20Week%20in%202020.png)
 
-- Number of Accidents by Hour of the Day - This shows the number o accidents happening during pick up schooltime and after closing works hours - 3pm - 6pm. 
+- **Number of Accidents by Hour of the Day**  
+  - Highlights a spike in accidents between 3 PM and 6 PM, which aligns with school pick-up times and the end of the typical workday.
 
 ![Number of Accidents by Hour of the Day](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Number%20of%20Accidents%20by%20Hour%20of%20the%20Day.png)
 
-- Heatmap of Accidents by Location and Control - This shows that about 50% of accidents happened at no intersectiona nd where ther eis no traffic control e.g. Highways. Then accidenta happened at inteserctiuon and intersection related even with traffic control. 
+- **Heatmap of Accidents by Location and Control**  
+  - Reveals that nearly 50% of accidents occurred in areas with no intersections and no traffic control, such as highways.  
+  - A significant number of collisions also took place at intersections and intersection-related locations, even where traffic controls were present.
 
 ![Heatmap of Accidents by Location and Traffic Control](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Heatmap%20of%20Accidents%20by%20Location%20and%20Traffic%20Control.png)
 
