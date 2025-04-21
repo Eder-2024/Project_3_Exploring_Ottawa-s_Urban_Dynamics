@@ -42,7 +42,7 @@ Through insightful visualizations built with **Python, Pandas, Seaborn, Folium, 
 | **🚔 Police & Traffic Enforcement**  | - Where are the high-collision hotspots? <br> - What day of the week are collisions most frequent? <br> - Impact of environmental conditions?  | - Interactive map <br> - Day-of-week bar charts <br> - Daily accidents by environmental condition charts | - Increase patrols and traffic control at hotspots. <br> - Schedule DUI checks and speed traps during risky weather and on Fridays. |
 | **🏙️ Urban Planners & Local Councils** | - Which intersections and areas need redesign? <br> - Where do weather and infrastructure issues intersect?  | - Interactive map <br> - Heat maps <br> - Daily accidents by environmental condition charts | - Improve drainage and road treatments in snowy zones. <br> - Install smart traffic signals responsive to weather conditions. |
 | **🚑 Emergency Services**            | - Where should emergency readiness be prioritized? <br> - What conditions lead to severe accidents?  | - Weather vs. accident severity charts <br> - Heatmap of accidents by location and traffic control | - Allocate emergency resources near high-severity zones such as intersections and areas with no traffic control (e.g., highways). <br> - Improve response readiness during hazardous weather, such as snow. |
-| **📢 Educational Campaigners**       | - When do drivers need awareness the most? <br> - How does weather affect safe driving behavior?  | - Number of accidents by day of the week <br> - Number of accidents by hour of the day <br> - Daily accidents by environmental conditions | - Launch awareness campaigns during peak months (November to March) and rush hours (2-6 pm, school pickup and work close times). <br> - Tailor messages to weather-related risks (e.g., promote messages like: "Just because it’s not fatal doesn’t mean it’s safe"). |
+| **📢 Educational Campaigners**       | - When do drivers need awareness the most? <br> - How does weather affect safe driving behavior?  | - Number of accidents by day of the week <br> - Number of accidents by hour of the day <br> - Daily accidents by environmental conditions | - Launch awareness campaigns during peak months (November to March) and rush hours (2-6 pm, school pickup and work close times). <br> - Tailor messages to weather-related risks (e.g., promote messages like: “Survive the Slide”, “Stay Safe Even in Slow Collisions”). Launching these campaigns in late fall, before the snow hits, ensures drivers are prepared for the season ahead. |
 | **🧠 Data for Research & Innovation** | - What patterns emerge? <br> - How can data support predictive modeling and policy change?  | - All visualizations, especially time-series and severity correlations | - Use findings to build AI-driven safety alerts. <br> - Support data-driven policies and innovations in transport safety. |
 | **📦 Businesses & Logistics**        | - Which routes and times are safest for delivery operations?  | - Interactive maps | - Optimize delivery schedules around safe routes and times. <br> - Implement driver safety protocols during high-risk periods. <br> - Dynamically reroute trucks during snow events using weather-integrated GPS. |                      |
 
@@ -164,7 +164,8 @@ Each map marker also includes a pop-up with detailed information on the severity
 - ❌ **Fatal**: One or more individuals died either at the scene or later in the hospital.  
   *Marker: Dark red; circle with an “x” inside.*
 
-**Findings** - 
+**Findings** - Through our interactive accident map, we identified accident hotspots around key commercial corridors such as:
+  - Highway 417, Innes Road, and Rideau Street.
 
 ---
 
