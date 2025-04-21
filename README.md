@@ -135,6 +135,10 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
 
 Snow and precipitation significantly affect the number of vehicles involved in accidents.
 
+### :snowman: Fatalities by Weather Category
+Mean fatalities are exactly the same (1.0) for both Cold and Warm weather. This implies that the fatal accident severity may not be strongly based on weather.
+This outcome could be due to the limitation of our dataset. Refer to limitation of dataset.
+
 ---
 ## Summary of Visualisation Charts
 
