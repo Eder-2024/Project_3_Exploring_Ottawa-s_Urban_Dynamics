@@ -39,7 +39,7 @@ Through insightful visualizations built with **Python, Pandas, Seaborn, Folium, 
 
 | Stakeholder                         | Key Questions Answered                                                                                          | Visualizations Used                                                                 | Recommendations                                                                                                                                         |
 |------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **🚔 Police & Traffic Enforcement** | - Where are the high-collision hotspots?<br>- What day of the week are collisions most frequent?<br>- Impact of environmental conditions? | - Interactive collision map<br>- Day-of-week bar charts<br>- Daily accidents by environmental condition charts | - Increase patrols and traffic control at hotspots.<br>- Schedule DUI checks and speed traps during risky weather and on Fridays.                      |
+| **🚔 Police & Traffic Enforcement** | - Where are the high-collision hotspots?<br>- What day of the week are collisions most frequent?<br>- Impact of environmental conditions? | - Interactive map<br>- Day-of-week bar charts<br>- Daily accidents by environmental condition charts | - Increase patrols and traffic control at hotspots.<br>- Schedule DUI checks and speed traps during risky weather and on Fridays.                      |
 | **🏙️ Urban Planners & Local Councils** | - Which intersections and areas need redesign?<br>- Where do weather and infrastructure issues intersect?        | - Interactive map<br>- Heat maps                                                  | - Improve drainage and road treatments in snowy zones.<br>- Install smart traffic signals responsive to weather conditions.                            |
 | **🚑 Emergency Services**          | - Where should emergency readiness be prioritized?<br>- What conditions lead to severe accidents?                | - Weather vs. accident severity charts                                             | - Allocate emergency resources near high-severity zones.<br>- Improve response readiness during hazardous weather.                                      |
 | **📢 Educational Campaigners**     | - When do drivers need awareness the most?<br>- How does weather affect safe driving behavior?                   | - Viridis-colored line plots<br>- Monthly trend charts<br>- Rush-hour analysis     | - Launch awareness campaigns in peak months and during rush hours.<br>- Tailor messages to weather-related risks.                                       |
@@ -141,15 +141,16 @@ All weather variables (tavg, wspd, prcp, snow) show statistically significant ef
 
 ### ☃️ Fatalities by Weather Category
 
-Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
-
-- Suggests that fatal accident severity is not strongly weather-dependent in your current dataset — could be due to limited variance or sample size.
+Mean fatalities are exactly the same (1.0) for both Cold and Warm weather. This implies that the fatal accident severity may not be strongly based on weather.
+This outcome could be due to hthe limitation of our dataset. Refer to limitation of dataset.
 
 ---
 ## Summary of Visualisation Charts 
 - xxx
+
 --
 
+## Limitation of Dataset
 ## Recommendations:
 - xxx
 
