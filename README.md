@@ -161,16 +161,16 @@ The **interactive map** (rendered in HTML) displays the number of accidents that
 Each map marker also includes a pop-up with detailed information on the severity of the incident:
 
 - **Minimal**: Only superficial damage (e.g., scratches), with no medical intervention required.  
-  *Marker: Green circle with an “i” inside.*
+  *Marker: Green; circle with an “i” inside.*
 
 - **Minor**: Victims were assessed by ambulance staff but not taken to the hospital.  
-  *Marker: Orange circle with an exclamation mark (!).*
+  *Marker: Orange; circle with an exclamation mark (!).*
 
 - **Major**: Victims were transported to the hospital in critical or serious condition.  
-  *Marker: Light red triangle with an exclamation mark (!).*
+  *Marker: Light red; triangle with an exclamation mark (!).*
 
 - ❌ **Fatal**: One or more individuals died either at the scene or later in the hospital.  
-  *Marker: Dark red circle with an “x” inside.*
+  *Marker: Dark red; circle with an “x” inside.*
 
 ---
 
