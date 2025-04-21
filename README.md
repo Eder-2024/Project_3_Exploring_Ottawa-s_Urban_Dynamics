@@ -129,24 +129,24 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
    
 ## 📉 Summary Findings 📈
 
-## Summary of Statistical Analysis 
+### Summary of Statistical Analysis 
 
-## Snow & Precipitation Impact (T-Tests)
+### Snow & Precipitation Impact (T-Tests)
 
 Snow and precipitation significantly affect the number of vehicles involved in accidents:
 
-## Weather & Fatalities (Linear Regression)
+### Weather & Fatalities (Linear Regression)
 
 All weather variables (tavg, wspd, prcp, snow) show statistically significant effects on the number of fatalities. 
 
-## ☃️ Fatalities by Weather Category
+### ☃️ Fatalities by Weather Category
 
 Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 
 - Suggests that fatal accident severity is not strongly weather-dependent in your current dataset — could be due to limited variance or sample size.
 
 
-## Summary of Visualisation Charts 
+### Summary of Visualisation Charts 
 - xxx
 --
 
@@ -221,14 +221,13 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 ## 📚 License & Data Sources
 This project uses open data provided by two official sources:
 
----
 ### 🚦 **Traffic Accident Data**  
 **Source**: [City of Ottawa Open Data Portal](https://open.ottawa.ca/datasets/bf701649829642d28fa2e400a7136bdd_0/explore?location=45.249450%2C-75.797667%2C0.84)  
 **License**: [Open Government License – City of Ottawa](https://open.ottawa.ca/pages/licence/)  
 > The City of Ottawa provides free access to many of its datasets through a dedicated data portal.  
 > The data is licensed under the **Open Government License**, making it easy to use and reuse.  
-> For more information, visit [Open Ottawa](https://open.ottawa.ca).
----
+> For more information, visit [Open Ottawa](https://open.ottawa.ca)
+
 ### 🌤 **Weather Data**  
 **Source**: [Meteostat – Ottawa Historical Weather](https://meteostat.net/en/place/ca/ottawa?s=71063&t=2020-01-01/2020-12-31)  
 **License**:  
