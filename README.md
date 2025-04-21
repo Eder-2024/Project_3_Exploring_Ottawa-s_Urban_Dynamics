@@ -164,6 +164,8 @@ Each map marker also includes a pop-up with detailed information on the severity
 - ❌ **Fatal**: One or more individuals died either at the scene or later in the hospital.  
   *Marker: Dark red; circle with an “x” inside.*
 
+**Findings** - 
+
 ---
 
 ### 🔥 Heat Map
