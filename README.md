@@ -129,7 +129,7 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
    
 ## 📉 Summary Findings 📈
 
-### Summary of Statistical Analysis 
+## Summary of Statistical Analysis 
 
 ### Snow & Precipitation Impact (T-Tests)
 
@@ -145,8 +145,8 @@ Mean fatalities are exactly the same (1.0) for both Cold and Warm weather:
 
 - Suggests that fatal accident severity is not strongly weather-dependent in your current dataset — could be due to limited variance or sample size.
 
-
-### Summary of Visualisation Charts 
+---
+## Summary of Visualisation Charts 
 - xxx
 --
 
@@ -234,7 +234,7 @@ This project uses open data provided by two official sources:
 > Copyright © Meteostat  
 > Weather data provided by **NOAA**, **Deutscher Wetterdienst**, and **Environment Canada**.  
 > For full details, see [Meteostat Legal & Privacy](https://meteostat.net/en/about/legal).
----
+
 This project itself is released under the **MIT License** for educational and research purposes.
 
 ---
