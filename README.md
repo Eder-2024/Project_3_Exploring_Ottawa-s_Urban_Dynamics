@@ -139,9 +139,8 @@ Snow and precipitation significantly affect the number of vehicles involved in a
 
 All weather variables (tavg, wspd, prcp, snow) show statistically significant effects on the number of fatalities. 
 However, the model has issues:
-Negative R-squared (-inf): Likely due to constant values (fatalities always = 1), or small sample variation.
-Multicollinearity warning: Weather variables may be too correlated with each other.
-Still, significance (p < 0.05) implies a predictable, though weak, relationship.
+- Negative R-squared (-inf): Likely due to constant values (fatalities always = 1), or small sample variation.
+- Multicollinearity warning: Weather variables may be too correlated with each other. Still, significance (p < 0.05) implies a predictable, though weak, relationship.
 
 ### ☃️ Fatalities by Weather Category
 
