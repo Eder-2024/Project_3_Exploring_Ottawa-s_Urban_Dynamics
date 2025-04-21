@@ -133,19 +133,7 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
 
 ### Snow & Precipitation Impact (T-Tests)
 
-Snow and precipitation significantly affect the number of vehicles involved in accidents:
-
-### Weather & Fatalities (Linear Regression & Correlation)
-
-All weather variables (tavg, wspd, prcp, snow) show statistically significant effects on the number of fatalities. 
-However, the model has issues:
-- Negative R-squared (-inf): Likely due to constant values (fatalities always = 1), or small sample variation.
-- Multicollinearity warning: Weather variables may be too correlated with each other. Still, significance (p < 0.05) implies a predictable, though weak, relationship.
-
-### ☃️ Fatalities by Weather Category
-
-Mean fatalities are exactly the same (1.0) for both Cold and Warm weather. This implies that the fatal accident severity may not be strongly based on weather.
-This outcome could be due to the limitation of our dataset. Refer to limitation of dataset.
+Snow and precipitation significantly affect the number of vehicles involved in accidents.
 
 ---
 ## Summary of Visualisation Charts
@@ -155,7 +143,7 @@ This outcome could be due to the limitation of our dataset. Refer to limitation 
 The **interactive map** (rendered in HTML) displays the number of accidents that occurred at each location across Ottawa. Marker colors indicate the accident volume:
 
 - 🟢 **Green** circle: Low number of accidents  
-- 🟡 **Yellowish** circle: Medium number of accidents  
+- 🟡 **Amber** circle: Medium number of accidents  
 - 🟠 **Orange** circle: High number of accidents
 
 Each map marker also includes a pop-up with detailed information on the severity of the incident:
@@ -179,7 +167,7 @@ Each map marker also includes a pop-up with detailed information on the severity
 The **heat map** displays collision density throughout Ottawa. It uses gradient hues to represent the concentration of incidents:
 
 - 🟢 **Green**: Low accident density  
-- 🟠 **Amber**: Moderate accident density  
+- 🟠 **Orange**: Moderate accident density  
 - 🔴 **Red**: High accident density
 
 This map is accessible through a separate tab linked from the main visualizations HTML file.
