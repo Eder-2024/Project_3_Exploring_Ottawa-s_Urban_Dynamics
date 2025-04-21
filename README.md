@@ -37,14 +37,14 @@ Through insightful visualizations built with **Python, Pandas, Seaborn, Folium, 
 
 ### 🎯 Stakeholder Focus & Questions Answered
 
-| Stakeholder                         | Key Questions Answered                                                                                          | Visualizations Used                                                                 | Recommendations                                                                                                                                         |
-|------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **🚔 Police & Traffic Enforcement** | - Where are the high-collision hotspots?<br>- What day of the week are collisions most frequent?<br>- Impact of environmental conditions? | - Interactive map<br>- Day-of-week bar charts<br>- Daily accidents by environmental condition charts | - Increase patrols and traffic control at hotspots.<br>- Schedule DUI checks and speed traps during risky weather and on Fridays.                      |
-| **🏙️ Urban Planners & Local Councils** | - Which intersections and areas need redesign?<br>- Where do weather and infrastructure issues intersect?        | - Interactive map<br>- Heat maps                                                  | - Improve drainage and road treatments in snowy zones.<br>- Install smart traffic signals responsive to weather conditions.                            |
-| **🚑 Emergency Services**          | - Where should emergency readiness be prioritized?<br>- What conditions lead to severe accidents?                | - Weather vs. accident severity charts                                             | - Allocate emergency resources near high-severity zones.<br>- Improve response readiness during hazardous weather.                                      |
-| **📢 Educational Campaigners**     | - When do drivers need awareness the most?<br>- How does weather affect safe driving behavior?                   | - Viridis-colored line plots<br>- Monthly trend charts<br>- Rush-hour analysis     | - Launch awareness campaigns in peak months and during rush hours.<br>- Tailor messages to weather-related risks.                                       |
-| **🧠 Data for Research & Innovation** | - What patterns emerge across seasons and years?<br>- How can data support predictive modeling and policy change? | - All visualizations, especially time-series and severity correlations              | - Use findings to build AI-driven safety alerts.<br>- Support data-driven policies and innovations in transport safety.                                |
-| **📦 Businesses & Logistics**      | - Which routes and times are safest for delivery operations?                                                     | - Interactive accident maps                                                        | - Optimize delivery schedules around safe routes and times.<br>- Implement driver safety protocols during high-risk periods.                            |
+| Stakeholder                          | Key Questions Answered                                                                                       | Visualizations Used                                                                 | Recommendations                                                                                                                                    |
+|--------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| **🚔 Police & Traffic Enforcement**  | - Where are the high-collision hotspots? <br> - What day of the week are collisions most frequent? <br> - Impact of environmental conditions?  | - Interactive map <br> - Day-of-week bar charts <br> - Daily accidents by environmental condition charts | - Increase patrols and traffic control at hotspots. <br> - Schedule DUI checks and speed traps during risky weather and on Fridays. |
+| **🏙️ Urban Planners & Local Councils** | - Which intersections and areas need redesign? <br> - Where do weather and infrastructure issues intersect?  | - Interactive map <br> - Heat maps <br> - Daily accidents by environmental condition charts | - Improve drainage and road treatments in snowy zones. <br> - Install smart traffic signals responsive to weather conditions. |
+| **🚑 Emergency Services**            | - Where should emergency readiness be prioritized? <br> - What conditions lead to severe accidents?  | - Weather vs. accident severity charts <br> - Heatmap of accidents by location and traffic control | - Allocate emergency resources near high-severity zones such as intersections and areas with no traffic control (e.g., highways). <br> - Improve response readiness during hazardous weather, such as snow. |
+| **📢 Educational Campaigners**       | - When do drivers need awareness the most? <br> - How does weather affect safe driving behavior?  | - Number of accidents by day of the week <br> - Number of accidents by hour of the day <br> - Daily accidents by environmental conditions | - Launch awareness campaigns during peak months (November to March) and rush hours (3-6 pm, school pickup and work close times). <br> - Tailor messages to weather-related risks (e.g., promote messages like: "Just because it’s not fatal doesn’t mean it’s safe"). |
+| **🧠 Data for Research & Innovation** | - What patterns emerge? <br> - How can data support predictive modeling and policy change?  | - All visualizations, especially time-series and severity correlations | - Use findings to build AI-driven safety alerts. <br> - Support data-driven policies and innovations in transport safety. |
+| **📦 Businesses & Logistics**        | - Which routes and times are safest for delivery operations?  | - Interactive maps | - Optimize delivery schedules around safe routes and times. <br> - Implement driver safety protocols during high-risk periods. <br> - Dynamically reroute trucks during snow events using weather-integrated GPS. |                      |
 
 ---
 
@@ -135,63 +135,89 @@ You can run this app either via **Visual Studio Code** or the **Windows Command 
 
 Snow and precipitation significantly affect the number of vehicles involved in accidents:
 
-### Weather & Fatalities (Linear Regression)
+### Weather & Fatalities (Linear Regression & Correlation)
 
 All weather variables (tavg, wspd, prcp, snow) show statistically significant effects on the number of fatalities. 
+However, the model has issues:
+Negative R-squared (-inf): Likely due to constant values (fatalities always = 1), or small sample variation.
+Multicollinearity warning: Weather variables may be too correlated with each other.
+Still, significance (p < 0.05) implies a predictable, though weak, relationship.
 
 ### ☃️ Fatalities by Weather Category
 
 Mean fatalities are exactly the same (1.0) for both Cold and Warm weather. This implies that the fatal accident severity may not be strongly based on weather.
-This outcome could be due to hthe limitation of our dataset. Refer to limitation of dataset.
+This outcome could be due to the limitation of our dataset. Refer to limitation of dataset.
 
 ---
-## Summary of Visualisation Charts 
-- xxx
+## Summary of Visualisation Charts
+
+### 🔍 Interactive Map
+
+The **interactive map** (rendered in HTML) displays the number of accidents that occurred at each location across Ottawa. Marker colors indicate the accident volume:
+
+- 🟢 **Green** circle: Low number of accidents  
+- 🟡 **Yellowish** circle: Medium number of accidents  
+- 🟠 **Orange** circle: High number of accidents
+
+Each map marker also includes a pop-up with detailed information on the severity of the incident:
+
+- **Minimal**: Only superficial damage (e.g., scratches), with no medical intervention required.  
+  *Marker: Green circle with an “i” inside.*
+
+- **Minor**: Victims were assessed by ambulance staff but not taken to the hospital.  
+  *Marker: Orange circle with an exclamation mark (!).*
+
+- **Major**: Victims were transported to the hospital in critical or serious condition.  
+  *Marker: Light red triangle with an exclamation mark (!).*
+
+- ❌ **Fatal**: One or more individuals died either at the scene or later in the hospital.  
+  *Marker: Dark red circle with an “x” inside.*
+
+---
+
+### 🔥 Heat Map
+
+The **heat map** displays collision density throughout Ottawa. It uses gradient hues to represent the concentration of incidents:
+
+- 🟢 **Green**: Low accident density  
+- 🟠 **Amber**: Moderate accident density  
+- 🔴 **Red**: High accident density
+
+This map is accessible through a separate tab linked from the main visualizations HTML file.
+
+---
+
+- Scatter plot - Severity vs. Weather - This shoes the impact of the weather on the severity of accidents in terms of fatal, major, minor and minimal.
+
+![Scatter Plot - Severity vs Weather](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Scatter%20Plot%20-%20Severity%20vs%20Weather.png)
+
+- Daily Accidents by Environmental conditions - This shows that in the winter months - snow led to high number of accidents on certain dates between Nvember and MaRCH with great fatalities.
+
+![Daily Accidents by Environmental Conditions in 2020](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Daily%20Accidents%20by%20Environmental%20Conditions%20in%202020.png)
+
+- Top Dates chart - This shows the dates with the highest number of accidents are seen between November and March.
+
+![top-dates-chart](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/top-dates-chart.png)
+
+- Number of Accidents by Day of the week - This shows that most accidents happened on Friday and this couls be as a result that its the last day f the week with many celebrating TGIF, parties and some may be driving under influence.
+
+![Number of Accidents by Day of the Week in 2020](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Number%20of%20Accidents%20by%20Day%20of%20the%20Week%20in%202020.png)
+
+- Number of Accidents by Hour of the Day - This shows the number o accidents happening during pick up schooltime and after closing works hours - 3pm - 6pm. 
+
+![Number of Accidents by Hour of the Day](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Number%20of%20Accidents%20by%20Hour%20of%20the%20Day.png)
+
+- Heatmap of Accidents by Location and Control - This shows that about 50% of accidents happened at no intersectiona nd where ther eis no traffic control e.g. Highways. Then accidenta happened at inteserctiuon and intersection related even with traffic control. 
+
+![Heatmap of Accidents by Location and Traffic Control](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Heatmap%20of%20Accidents%20by%20Location%20and%20Traffic%20Control.png)
 
 --
 
-## Limitation of Dataset
-## Recommendations:
-- xxx
+## Limitations of the Dataset
 
-### 🚔 1. Police & Traffic Enforcement
-- **Insight:** Snow conditions significantly increase accident volume.
-- **Action:**
-  - Increase patrols during snowfall and icy conditions.
-  - Set up temporary enforcement zones or automated alerts during winter storms.
-  - Consider more frequent DUI checks or speed traps during risky weather conditions.
-
-### 🌆 2. Urban Planners & Local Councils
-- **Insight:** Snowy conditions result in more accidents, but fatalities don’t vary much between warm/cold.
-- **Action:**
-  - Improve road treatment and drainage in high-snowfall zones.
-  - Add smart traffic signals that adapt to weather inputs.
-  - Prioritize infrastructure upgrades in areas with high vehicle counts during snow.
-
-### 🚑 3. Emergency Services
-- **Insight:** Snow and precipitation correlate with more multi-vehicle accidents.
-- **Action:**
-  - Route EMS services to avoid congested accident-prone roads during snowstorms.
-  - Use predictive weather data to staff accordingly for expected spikes in accidents.
-
-### 📢 4. Educational Campaigns
-- **Insight:** Accident counts rise during snow, even if fatalities don’t.
-- **Action:**
-  - Focus campaigns on defensive driving in winter.
-  - Promote messages like: "Just because it’s not fatal doesn’t mean it’s safe."
-  - Run these campaigns ahead of snowy seasons.
-
-### 🧠 5. Data for Research & Innovation
-- **Insight:** Strong statistical relationship between snow and accident counts, but weak link with fatality variation.
-- **Action:**
-  - Use this as a foundation for machine learning models predicting accident risk.
-  - Feed into smart city simulations and test how autonomous vehicles behave in snow/precipitation scenarios.
-
-### 🏢 6. Businesses & Logistics
-- **Insight:** Snow is a high-risk condition for delivery fleets.
-- **Action:**
-  - Dynamically reroute trucks during snow events using weather-integrated GPS.
-  - Adjust delivery windows and avoid sending vehicles during peak snow hours.
+- The dataset covers only a single year, limiting the ability to identify long-term trends or seasonal patterns. A multi-year dataset would provide deeper insights and support more accurate predictive modeling.
+- There is no information about drivers or vehicles involved in the collisions. This limits the ability to analyze contributing factors such as driver behavior, vehicle type, or condition.
+- Weather data was matched by date only, not by the specific time of each accident. Since weather conditions can change rapidly within a day, this reduces the accuracy of correlation analysis between weather and collisions.
 
 ---
 
