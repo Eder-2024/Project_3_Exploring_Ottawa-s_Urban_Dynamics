@@ -202,6 +202,7 @@
                 <select name="viz" id="viz">
                     <option value="">-- Select --</option>
                     <option value="heatmap">Heatmap 🌍 (opens in new tab)</option>
+                    <option value="heatmap_intersection">heatmap_intersection 🌍 (opens in new tab)</option>
                     <option value="light_conditions">Pie Chart - Light Conditions</option>
                     <option value="severity_weather">Scatter Plot - Severity vs Weather</option>
                     <option value="hourly_accidents">Number of Accidents by Hour of the Day</option>
@@ -314,6 +315,15 @@ loadTopDatesChart();
         const selectedViz = document.getElementById('viz').value;
         if (selectedViz === 'heatmap') {
             window.open('/heatmap', '_blank');
+            e.preventDefault(); // Prevent form from submitting
+        }
+    });
+
+        // Open heatmap in new tab instead of form submission
+        document.getElementById('viz-form').addEventListener('submit', function (e) {
+        const selectedViz = document.getElementById('viz').value;
+        if (selectedViz === 'heatmap_intersection') {
+            window.open('/heatmap_intersection', '_blank');
             e.preventDefault(); // Prevent form from submitting
         }
     });

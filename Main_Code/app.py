@@ -365,6 +365,33 @@ def heatmap():
     HeatMap(df[['latitude', 'longitude']].values.tolist()).add_to(m)
     return m.get_root().render()
 
+
+@app.route('/heatmap_intersection')
+def heatmap_intersection():
+    conn = get_db_connection()
+# Query only accidents at intersections with valid lat/lon
+    query = """
+    SELECT a.latitude, a.longitude
+    FROM accidents_data a
+    JOIN accident_details d
+    ON a.date = d.accident_date
+    WHERE d.accident_location = '03 - At intersection'
+    AND a.latitude IS NOT NULL AND a.longitude IS NOT NULL
+    """
+    
+    df = pd.read_sql(query, conn)
+    conn.close()
+
+    # If no data, return a friendly message
+    if df.empty:
+        return "<h3>No intersection collision data available to display.</h3>"
+
+    # Create the heatmap
+    m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=12)
+    HeatMap(df[['latitude', 'longitude']].values.tolist(), radius=10).add_to(m)
+    
+    return m.get_root().render()
+
 @app.route('/map', methods=['GET'])
 def map_view():
     # Basic cluster map with severity layers
