@@ -216,7 +216,7 @@ This map is accessible through a separate tab linked from the main visualization
 ### Summary
 In a nutshell, 
   - **When** - Accidents occured mostly between 2 - 6pm and mostly on Fridays. 
-  - **Where** - No control that are not intersection related areas like Highway 417, also intersection related like Innes Road, and Rideau Street.
+  - **Where** - Non- intersection related areas with no control like Highway 417, also intersection related areas like Innes Road, and Rideau Street.
   - **Why** - Accidents occured due to after-work rush hours and pick up times, snowy months (November - March), July had the most fatal accidents possibly due to high precipitation - rain. Also, accidents on Fridays could be due to those driving under influence.
 
 ---
