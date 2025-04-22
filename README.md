@@ -212,12 +212,13 @@ This map is accessible through a separate tab linked from the main visualization
 
 ![Heatmap of Accidents by Location and Traffic Control](https://github.com/Eder-2024/Project_3_Exploring_Ottawa-s_Urban_Dynamics/blob/5c1492521eda73e9828ac5337b4947991569be02/Images/Heatmap%20of%20Accidents%20by%20Location%20and%20Traffic%20Control.png)
 
-## Summary
+### Summary
 In a nutshell, 
   - **When** - Accidents occured mostly between 2 - 6pm and mostly on Fridays. 
-  - **Where** - No control areas that are not intersection related like Highway 417, also intersection related like Innes Road, and Rideau Street.
-  - **Why** - Accidents occured due to after-work rush hours and pick up times, snowy months (November - March), rainy days like July had the most fatal accidents possibly due to high precipitation - rain. Also, accidents on Fridays could be due to those driving under influence.
---
+  - **Where** - No control that are not intersection related areas like Highway 417, also intersection related like Innes Road, and Rideau Street.
+  - **Why** - Accidents occured due to after-work rush hours and pick up times, snowy months (November - March), July had the most fatal accidents possibly due to high precipitation - rain. Also, accidents on Fridays could be due to those driving under influence.
+
+---
 
 ## Limitations of the Dataset
 
